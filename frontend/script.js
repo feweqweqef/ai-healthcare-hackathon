@@ -5,74 +5,196 @@
    ========================================================== */
 
 const QUESTIONS = [
+  { field: 'age', type: 'number', label: 'Age', hint: 'Age in years', min: 1, max: 120 },
+  { field: 'height_cm', type: 'number', label: 'Height (cm)', hint: 'Height in centimetres', min: 50, max: 250 },
+  { field: 'weight_kg', type: 'number', label: 'Weight (kg)', hint: 'Weight in kilograms', min: 2, max: 500 },
+
   {
     field: 'migraine_aura',
-    type: 'choice',
-    label: 'Migraine with aura',
-    hint: 'Flashing lights, zigzags or blind spots before a headache'
+    type: 'select',
+    label: 'Migraine history',
+    hint: 'Select the option that best describes the patient',
+    options: [
+      ['none', 'No migraine'],
+      ['without_aura', 'Migraine without aura'],
+      ['with_aura', 'Migraine with aura'],
+      ['aura_history_5plus_years', 'History of aura 5 or more years ago'],
+      ['unknown', 'Not sure']
+    ]
   },
   {
-    field: 'smoker',
-    type: 'choice',
-    label: 'Currently smokes',
-    hint: 'Cigarettes or other tobacco'
+    field: 'smoking_status',
+    type: 'select',
+    label: 'Smoking status',
+    hint: 'Ask about current and previous smoking',
+    options: [
+      ['non_smoker', 'Does not currently smoke'],
+      ['current_smoker', 'Currently smokes'],
+      ['stopped_under_1yr', 'Stopped less than 1 year ago'],
+      ['stopped_1yr_plus', 'Stopped 1 year ago or longer'],
+      ['unknown', 'Not sure']
+    ]
+  },
+  {
+    field: 'cigarettes_per_day',
+    type: 'number',
+    label: 'Cigarettes smoked per day',
+    hint: 'For current smokers; enter 0 if none',
+    min: 0,
+    max: 200
   },
   {
     field: 'bp',
     type: 'bp',
     label: 'Blood pressure',
-    hint: 'Today’s reading, or the most recent one'
+    hint: 'Enter the most recent reading, if available'
+  },
+  {
+    field: 'personal_clots',
+    type: 'select',
+    label: 'Personal history of blood clots',
+    hint: 'DVT means deep vein thrombosis; PE means pulmonary embolism',
+    options: [
+      ['none', 'No personal history of DVT or PE'],
+      ['current_or_history', 'Current or previous DVT or PE'],
+      ['unknown', 'Not sure']
+    ]
   },
   {
     field: 'family_clots',
-    type: 'choice',
-    label: 'Blood clots in the family',
-    hint: 'A parent, brother or sister who had a clot or stroke when young'
+    type: 'select',
+    label: 'Family history of blood clots',
+    hint: 'Particularly a parent, sibling or child',
+    options: [
+      ['none', 'No known first-degree family history'],
+      ['first_degree', 'A parent, sibling or child has had a blood clot'],
+      ['unknown', 'Not sure']
+    ]
   },
   {
-    field: 'breast_cancer',
-    type: 'choice',
-    label: 'Breast cancer',
-    hint: 'Now or in the past'
+    field: 'clotting_disorder',
+    type: 'select',
+    label: 'Known clotting disorder',
+    hint: 'For example, Factor V Leiden',
+    options: [
+      ['none', 'No known clotting disorder'],
+      ['known_inherited_or_acquired', 'Known inherited or acquired clotting disorder'],
+      ['unknown', 'Not sure']
+    ]
+  },
+  {
+    field: 'major_surgery_immobilisation',
+    type: 'select',
+    label: 'Major surgery or prolonged immobilisation',
+    hint: 'Ask about planned or recent major surgery involving prolonged immobility',
+    options: [
+      ['none', 'No relevant planned or recent surgery'],
+      ['planned_or_recent', 'Planned or recent major surgery with prolonged immobilisation'],
+      ['unknown', 'Not sure']
+    ]
+  },
+  {
+    field: 'heart_or_stroke_history',
+    type: 'select',
+    label: 'Heart disease or stroke history',
+    hint: 'Include transient ischaemic attack (TIA)',
+    options: [
+      ['none', 'No known history'],
+      ['ischaemic_heart_disease', 'Current or previous ischaemic heart disease'],
+      ['stroke_or_tia', 'Current or previous stroke or TIA'],
+      ['other_vascular_disease', 'Other heart or vascular disease'],
+      ['unknown', 'Not sure']
+    ]
   },
   {
     field: 'diabetes',
-    type: 'choice',
-    label: 'Diabetes',
-    hint: 'Type 1 or type 2'
+    type: 'select',
+    label: 'Diabetes history',
+    hint: 'Include any diabetes-related complications',
+    options: [
+      ['none', 'No diabetes'],
+      ['gestational_history', 'History of gestational diabetes only'],
+      ['non_vascular', 'Diabetes without known vascular complications'],
+      ['with_complications', 'Diabetes with complications'],
+      ['other_vascular_disease', 'Diabetes with other vascular disease'],
+      ['unknown', 'Not sure']
+    ]
   },
   {
-    field: 'allergies',
-    type: 'choice',
-    label: 'Allergy to hormonal contraception',
-    hint: 'To the pill or anything in it'
+    field: 'liver_disease',
+    type: 'select',
+    label: 'Liver disease history',
+    hint: 'Select a known diagnosis, if applicable',
+    options: [
+      ['none', 'No known liver disease'],
+      ['viral_hepatitis_acute', 'Acute viral hepatitis'],
+      ['carrier_or_chronic', 'Chronic viral hepatitis or carrier status'],
+      ['cirrhosis_mild', 'Mild cirrhosis'],
+      ['cirrhosis_severe', 'Severe cirrhosis'],
+      ['benign_tumour_fnh', 'Benign liver tumour / focal nodular hyperplasia'],
+      ['adenoma_or_malignant', 'Liver adenoma or malignant liver tumour'],
+      ['unknown', 'Not sure']
+    ]
+  },
+  {
+    field: 'breast_cancer',
+    type: 'select',
+    label: 'Breast cancer history',
+    hint: 'Include personal history and any known BRCA mutation',
+    options: [
+      ['none', 'No personal history'],
+      ['family_history_only', 'Family history only'],
+      ['brca_carrier', 'Known BRCA mutation'],
+      ['completed_treatment', 'Previous breast cancer; treatment completed'],
+      ['current_treatment', 'Current breast cancer treatment'],
+      ['unknown', 'Not sure']
+    ]
   },
   {
     field: 'other_meds',
-    type: 'choice',
-    label: 'Other medicines that can affect the pill',
-    hint: 'For example some epilepsy medicines, rifampicin, St John’s wort'
+    type: 'text',
+    label: 'Current medicines and supplements',
+    hint: 'List names and doses if known, including non-prescription medicines'
+  },
+  {
+    field: 'hep_c_antivirals',
+    type: 'select',
+    label: 'Hepatitis C antiviral medicines',
+    hint: 'Ask specifically about current hepatitis C treatment',
+    options: [
+      ['yes', 'Yes'],
+      ['no', 'No'],
+      ['unknown', 'Not sure']
+    ]
+  },
+  {
+    field: 'allergies',
+    type: 'text',
+    label: 'Allergies',
+    hint: 'List the substance and reaction, or enter "No known allergies" if confirmed'
   }
 ];
 
-const CHOICES = [
-  ['yes', 'Yes'],
-  ['no', 'No'],
-  ['unknown', 'Not sure']
-];
 
-const EXAMPLE_NOTES = `FICTIONAL HACKATHON TEST PATIENT, age 28.
+/* ==========================================================
+   2. FICTIONAL TEST NOTES
+   ========================================================== */
+
+const EXAMPLE_NOTES = `FICTIONAL HACKATHON TEST PATIENT — NOT A REAL PATIENT.
+Age 28. Height 165 cm. Weight 62 kg.
 Wants to discuss the combined pill.
 Smokes about 10 cigarettes a day. BP today 148/94.
 Gets headaches with visual aura (zigzag lines) about once a month.
-Mum had a DVT at 40. No history of breast cancer.
-No diabetes mentioned. Not on any regular medicines.
-No known allergies.`;
+No personal history of DVT or PE. Mum had a DVT at 40.
+No known clotting disorder. No planned or recent major surgery involving prolonged immobilisation.
+No known history of ischaemic heart disease, stroke or TIA.
+No history of diabetes. No known liver disease.
+No history of breast cancer. Not on any regular medicines.
+No current hepatitis C antiviral treatment. No known allergies.`;
 
 
 /* ==========================================================
-   2. AI EXTRACTION
-   Calls the local backend, which sends notes to Ollama.
+   3. AI EXTRACTION
    ========================================================== */
 
 async function extractFromNotes(notes) {
@@ -101,8 +223,7 @@ async function extractFromNotes(notes) {
 
 
 /* ==========================================================
-   3. DEMO RULES ONLY
-   NOT validated UKMEC rules. NOT for clinical use.
+   4. DEMO RULES — NOT CLINICALLY VALIDATED
    ========================================================== */
 
 function getResult(answers) {
@@ -123,22 +244,22 @@ function getResult(answers) {
 
   QUESTIONS.forEach((q) => {
     if (q.type === 'bp') {
-      const s = answers.bp_systolic;
-      const d = answers.bp_diastolic;
+      const systolic = answers.bp_systolic;
+      const diastolic = answers.bp_diastolic;
 
-      if (s == null || d == null) {
+      if (systolic == null || diastolic == null) {
         reasons.push(
-          'Blood pressure: not measured. Take a reading before prescribing.'
+          'Blood pressure has not been recorded. A clinician must assess this.'
         );
         raise('amber');
-      } else if (s >= 160 || d >= 100) {
+      } else if (systolic >= 160 || diastolic >= 100) {
         reasons.push(
-          `Blood pressure ${s}/${d}: placeholder red rule, not a clinical rule.`
+          `Blood pressure entered: ${systolic}/${diastolic}. Requires clinician review (demo flag).`
         );
         raise('red');
-      } else if (s >= 140 || d >= 90) {
+      } else if (systolic >= 140 || diastolic >= 90) {
         reasons.push(
-          `Blood pressure ${s}/${d}: placeholder amber rule, not a clinical rule.`
+          `Blood pressure entered: ${systolic}/${diastolic}. Requires clinician review (demo flag).`
         );
         raise('amber');
       }
@@ -146,21 +267,73 @@ function getResult(answers) {
       return;
     }
 
-    const answer = answers[q.field];
+    const value = answers[q.field];
 
-    if (answer === 'unknown') {
-      reasons.push(`${q.label}: not answered. Ask before prescribing.`);
-      raise('amber');
-    } else if (answer === 'yes') {
-      const demoRed =
-        q.field === 'migraine_aura' ||
-        q.field === 'breast_cancer';
-
+    if (value == null || value === '' || value === 'unknown') {
       reasons.push(
-        `${q.label}: yes (placeholder demo rule, not a clinical rule).`
+        `${q.label}: not confirmed. Ask/check before any clinical decision.`
       );
+      raise('amber');
+      return;
+    }
 
-      raise(demoRed ? 'red' : 'amber');
+    if (
+      q.field === 'migraine_aura' &&
+      value === 'with_aura'
+    ) {
+      reasons.push(
+        'Migraine with aura selected: requires qualified clinician review (demo flag).'
+      );
+      raise('red');
+
+    } else if (
+      q.field === 'breast_cancer' &&
+      value === 'current_treatment'
+    ) {
+      reasons.push(
+        'Current breast cancer treatment selected: requires qualified clinician review (demo flag).'
+      );
+      raise('red');
+
+    } else if (
+      q.field === 'personal_clots' &&
+      value === 'current_or_history'
+    ) {
+      reasons.push(
+        'Personal history of blood clots selected: requires qualified clinician review (demo flag).'
+      );
+      raise('red');
+
+    } else if (
+      q.field === 'clotting_disorder' &&
+      value === 'known_inherited_or_acquired'
+    ) {
+      reasons.push(
+        'Known clotting disorder selected: requires qualified clinician review (demo flag).'
+      );
+      raise('red');
+
+    } else if (
+      (q.field === 'smoking_status' && value !== 'non_smoker') ||
+      (q.field === 'family_clots' && value === 'first_degree') ||
+      (q.field === 'major_surgery_immobilisation' && value === 'planned_or_recent') ||
+      (q.field === 'heart_or_stroke_history' && value !== 'none') ||
+      (q.field === 'diabetes' &&
+        ['with_complications', 'other_vascular_disease'].includes(value)) ||
+      (q.field === 'liver_disease' &&
+        [
+          'viral_hepatitis_acute',
+          'cirrhosis_severe',
+          'adenoma_or_malignant'
+        ].includes(value)) ||
+      (q.field === 'breast_cancer' &&
+        ['brca_carrier', 'completed_treatment'].includes(value)) ||
+      (q.field === 'hep_c_antivirals' && value === 'yes')
+    ) {
+      reasons.push(
+        `${q.label}: selected answer needs clinician review (demo flag).`
+      );
+      raise('amber');
     }
   });
 
@@ -168,52 +341,56 @@ function getResult(answers) {
     reasons.push('No flags found by the placeholder demo rules.');
   }
 
-  const followups = [
-    'Confirm each flagged answer with the patient',
-    'Explain the reason in plain words',
-    'Check the full UKMEC entry before prescribing'
-  ];
-
-  if (status === 'green') {
-    followups.push(
-      'Ask about anything these questions do not cover'
-    );
-  }
-
   return {
     status,
     reasons,
-    followups
+    followups: [
+      'Confirm the recorded answers with the patient.',
+      'Check relevant official guidance and product information.',
+      'A qualified clinician must make any prescribing decision.'
+    ]
   };
 }
 
 
 /* ==========================================================
-   4. PATIENT SHEET WORDING — PLACEHOLDER
+   5. PATIENT-FACING WORDING — PLACEHOLDER
    ========================================================== */
 
 const PATIENT_WORDING = {
   migraine_aura:
-    'You have described migraine symptoms with flashing lights or blind spots.',
-  smoker:
-    'You have said that you smoke.',
+    'You have provided information about migraine history that needs to be discussed with a clinician.',
+  smoking_status:
+    'You have provided information about smoking history.',
   family_clots:
-    'You have reported a close relative with a blood clot or stroke.',
-  breast_cancer:
-    'You have reported breast cancer now or in the past.',
+    'You have reported a close relative with a blood clot.',
+  personal_clots:
+    'You have reported a personal history of blood clots.',
+  clotting_disorder:
+    'You have reported a clotting disorder.',
+  major_surgery_immobilisation:
+    'You have reported planned or recent major surgery with prolonged immobility.',
+  heart_or_stroke_history:
+    'You have provided information about a heart, stroke or vascular history.',
   diabetes:
-    'You have reported diabetes.',
+    'You have provided information about diabetes history.',
+  liver_disease:
+    'You have provided information about liver disease history.',
+  breast_cancer:
+    'You have provided information about breast cancer history.',
+  hep_c_antivirals:
+    'You have provided information about hepatitis C antiviral treatment.',
   allergies:
-    'You have reported an allergy.',
+    'Please ensure any reported allergies and reactions are checked.',
   other_meds:
-    'You take other medicines that may need checking.'
+    'Your medicines and supplements should be checked for interactions.'
 };
 
 const SHEET_TEXT = {
   red: {
     heading: 'Your answers need a clinician’s review',
     next: [
-      'Your doctor will discuss suitable options with you.',
+      'A qualified clinician will discuss suitable options with you.',
       'This prototype cannot determine whether the combined pill is appropriate.'
     ]
   },
@@ -221,7 +398,7 @@ const SHEET_TEXT = {
   amber: {
     heading: 'Some information needs checking',
     next: [
-      'Your doctor will review these points with you.',
+      'A qualified clinician will review these points with you.',
       'This prototype cannot determine whether the combined pill is appropriate.'
     ]
   },
@@ -229,7 +406,7 @@ const SHEET_TEXT = {
   green: {
     heading: 'No flags found by the demo questions',
     next: [
-      'Your doctor will explain the options available to you.',
+      'A qualified clinician will explain the options available to you.',
       'This prototype does not cover every factor needed for a prescribing decision.'
     ]
   }
@@ -238,26 +415,23 @@ const SHEET_TEXT = {
 const STATUS_TEXT = {
   red: {
     title: 'Needs clinician review',
-    summary:
-      'A demo rule flagged at least one answer. This is not a clinical decision.'
+    summary: 'A demo rule flagged at least one answer. This is not a clinical decision.'
   },
 
   amber: {
     title: 'Needs a closer look',
-    summary:
-      'Some answers need checking. These are placeholder demo rules only.'
+    summary: 'Some answers need checking. These are placeholder demo rules only.'
   },
 
   green: {
     title: 'No demo flags found',
-    summary:
-      'This does not mean the combined pill is clinically suitable.'
+    summary: 'This does not mean the combined pill is clinically suitable.'
   }
 };
 
 
 /* ==========================================================
-   5. PAGE STATE
+   6. PAGE STATE
    ========================================================== */
 
 const $ = (id) => document.getElementById(id);
@@ -279,21 +453,29 @@ const state = {
 
 const rowRefs = {};
 
+function emptyAnswer(value = null, evidence = null) {
+  return {
+    value,
+    aiValue: value,
+    evidence
+  };
+}
+
 function freshState() {
   state.extracted = false;
   state.result = null;
   state.confirmedOn = null;
   state.answers = {};
 
-  QUESTIONS
-    .filter((q) => q.type === 'choice')
-    .forEach((q) => {
-      state.answers[q.field] = {
-        value: null,
-        aiValue: null,
-        evidence: null
-      };
-    });
+  QUESTIONS.forEach((q) => {
+    if (q.type !== 'bp') {
+      state.answers[q.field] = emptyAnswer(
+        q.type === 'text' || q.type === 'number'
+          ? ''
+          : null
+      );
+    }
+  });
 
   state.bp = {
     systolic: null,
@@ -302,16 +484,24 @@ function freshState() {
     aiDiastolic: null,
     evidence: null
   };
+
+  Object.keys(rowRefs).forEach((key) => {
+    delete rowRefs[key];
+  });
 }
 
 
 /* ==========================================================
-   6. SCREEN SWITCHING
+   7. SCREEN SWITCHING
    ========================================================== */
 
 function go(name) {
   SCREENS.forEach((screen) => {
-    $(`screen-${screen}`).hidden = screen !== name;
+    const element = $(`screen-${screen}`);
+
+    if (element) {
+      element.hidden = screen !== name;
+    }
   });
 
   const currentIndex = SCREENS.indexOf(name);
@@ -337,12 +527,16 @@ function go(name) {
     sheet: 'sheetTitle'
   };
 
-  $(headings[name]).focus({ preventScroll: true });
+  const heading = $(headings[name]);
+
+  if (heading) {
+    heading.focus({ preventScroll: true });
+  }
 }
 
 
 /* ==========================================================
-   7. SCREEN 1 — CONSULTATION NOTES
+   8. SCREEN 1 — CONSULTATION NOTES
    ========================================================== */
 
 $('useExample').addEventListener('click', () => {
@@ -361,23 +555,26 @@ $('readNotes').addEventListener('click', async () => {
   }
 
   const button = $('readNotes');
-
   button.disabled = true;
+
   status.textContent = 'Reading the notes with the local AI…';
 
   try {
     const found = await extractFromNotes(notes);
 
     applyExtraction(found);
+
     status.textContent = '';
 
     renderAnswers();
     go('answers');
+
   } catch (error) {
     console.error(error);
 
     status.textContent =
       'Could not read the notes. Check that the server and Ollama are running, or fill in the answers by hand.';
+
   } finally {
     button.disabled = false;
   }
@@ -391,80 +588,313 @@ $('skipNotes').addEventListener('click', () => {
 
 
 /* ==========================================================
-   8. APPLY AI EXTRACTION
+   9. APPLY AI EXTRACTION
    ========================================================== */
 
+function setExtracted(fieldName, value, evidence = null) {
+  if (!Object.prototype.hasOwnProperty.call(state.answers, fieldName)) {
+    return;
+  }
+
+  state.answers[fieldName] = {
+    value,
+    aiValue: value,
+    evidence: typeof evidence === 'string' ? evidence : null
+  };
+}
+
+function itemValue(item) {
+  return item && typeof item === 'object'
+    ? item.value
+    : item;
+}
+
+function itemEvidence(item) {
+  return item &&
+    typeof item === 'object' &&
+    typeof item.evidence === 'string'
+      ? item.evidence
+      : '';
+}
+
 function applyExtraction(found) {
+  const notes = $('notes').value;
+
+  // Age fallback: supports "age 28", "age: 28", and "28-year-old".
+  const ageMatch = notes.match(
+    /\bage\s*[:\-]?\s*(\d{1,3})\b|\b(\d{1,3})\s*[- ]year[- ]old\b/i
+  );
+
+  if (itemValue(found?.age) == null && ageMatch) {
+    found.age = {
+      value: Number(ageMatch[1] || ageMatch[2]),
+      evidence: ageMatch[0]
+    };
+  }
+
+  // Cigarettes-per-day fallback.
+  const cigaretteMatch =
+    notes.match(
+      /\b(?:smokes?|smoking)\s+(?:approximately\s+|about\s+|around\s+)?(\d{1,3})\s+cigarettes?\s+(?:a|per)\s+day\b/i
+    ) ||
+    notes.match(
+      /\b(\d{1,3})\s+cigarettes?\s+(?:a|per)\s+day\b/i
+    );
+
+  if (
+    itemValue(found?.cigarettes_per_day) == null &&
+    cigaretteMatch
+  ) {
+    found.cigarettes_per_day = {
+      value: Number(cigaretteMatch[1]),
+      evidence: cigaretteMatch[0]
+    };
+  }
+
+  // "No diabetes mentioned" means unknown, not a confirmed negative.
+  if (/\bno (?:history of )?diabetes mentioned\b/i.test(notes)) {
+    found.diabetes = {
+      value: null,
+      evidence: ''
+    };
+  }
+
   freshState();
   state.extracted = true;
 
-  QUESTIONS
-    .filter((q) => q.type === 'choice')
-    .forEach((q) => {
-      const field = found?.[q.field];
+  // Migraine mapping.
+  const migraine = found?.migraine_aura;
 
-      const value =
-        field && ['yes', 'no'].includes(field.value)
-          ? field.value
-          : null;
+  if (typeof itemValue(migraine) === 'string') {
+    const value = itemValue(migraine).toLowerCase();
 
-      state.answers[q.field] = {
+    if (['yes', 'with_aura'].includes(value)) {
+      setExtracted(
+        'migraine_aura',
+        'with_aura',
+        itemEvidence(migraine)
+      );
+    } else if (['no', 'none'].includes(value)) {
+      setExtracted(
+        'migraine_aura',
+        'none',
+        itemEvidence(migraine)
+      );
+    } else if (value === 'without_aura') {
+      setExtracted(
+        'migraine_aura',
+        'without_aura',
+        itemEvidence(migraine)
+      );
+    }
+  }
+
+  // Smoking status mapping.
+  const smoker = found?.smoker || found?.smoking_status;
+
+  if (typeof itemValue(smoker) === 'string') {
+    const value = itemValue(smoker).toLowerCase();
+
+    if (['no', 'non_smoker'].includes(value)) {
+      setExtracted(
+        'smoking_status',
+        'non_smoker',
+        itemEvidence(smoker)
+      );
+    } else if (['yes', 'current_smoker'].includes(value)) {
+      setExtracted(
+        'smoking_status',
+        'current_smoker',
+        itemEvidence(smoker)
+      );
+    } else if (
+      ['stopped_under_1yr', 'stopped_1yr_plus'].includes(value)
+    ) {
+      setExtracted(
+        'smoking_status',
         value,
-        aiValue: value,
-        evidence:
-          field && typeof field.evidence === 'string'
-            ? field.evidence
-            : null
-      };
-    });
+        itemEvidence(smoker)
+      );
+    }
+  }
 
-  const bp = found?.bp;
+  // Numeric fields: age, height, weight and cigarettes per day.
+  [
+    'age',
+    'height_cm',
+    'weight_kg',
+    'cigarettes_per_day'
+  ].forEach((key) => {
+    const item = found?.[key];
+    const raw = itemValue(item);
 
-  const systolic =
-    Number.isFinite(bp?.systolic) ? bp.systolic : null;
+    const number =
+      raw === '' || raw == null
+        ? null
+        : Number(raw);
 
-  const diastolic =
-    Number.isFinite(bp?.diastolic) ? bp.diastolic : null;
+    const question = QUESTIONS.find((q) => q.field === key);
+
+    if (
+      number !== null &&
+      Number.isFinite(number) &&
+      question &&
+      number >= question.min &&
+      number <= question.max
+    ) {
+      setExtracted(
+        key,
+        String(number),
+        itemEvidence(item)
+      );
+    }
+  });
+
+  // Map generic yes/no only for questions that support that mapping.
+  const simpleMapping = {
+    personal_clots: {
+      yes: 'current_or_history',
+      no: 'none'
+    },
+
+    family_clots: {
+      yes: 'first_degree',
+      no: 'none'
+    },
+
+    clotting_disorder: {
+      yes: 'known_inherited_or_acquired',
+      no: 'none'
+    },
+
+    major_surgery_immobilisation: {
+      yes: 'planned_or_recent',
+      no: 'none'
+    },
+
+    hep_c_antivirals: {
+      yes: 'yes',
+      no: 'no'
+    }
+  };
+
+  Object.entries(simpleMapping).forEach(([key, values]) => {
+    const item = found?.[key];
+    const raw = itemValue(item);
+
+    if (typeof raw !== 'string') return;
+
+    const value = raw.toLowerCase();
+
+    if (Object.prototype.hasOwnProperty.call(values, value)) {
+      setExtracted(
+        key,
+        values[value],
+        itemEvidence(item)
+      );
+    }
+  });
+
+  // These questions require more specific information.
+  // A generic "yes" is NOT enough to select a subtype.
+  [
+    'heart_or_stroke_history',
+    'diabetes',
+    'liver_disease',
+    'breast_cancer'
+  ].forEach((key) => {
+    const item = found?.[key];
+    const raw = itemValue(item);
+
+    if (typeof raw !== 'string') return;
+
+    const value = raw.toLowerCase();
+
+    if (value === 'no') {
+      setExtracted(
+        key,
+        'none',
+        itemEvidence(item)
+      );
+    }
+  });
+
+  // Free-text fields. The server represents explicit negative answers
+  // with value "no"; use the exact evidence as the visible text.
+  ['other_meds', 'allergies'].forEach((key) => {
+    const item = found?.[key];
+
+    if (!item) return;
+
+    const raw = itemValue(item);
+    const evidence = itemEvidence(item);
+
+    if (typeof raw !== 'string') return;
+
+    if (raw.toLowerCase() === 'no' && evidence) {
+      setExtracted(key, evidence, evidence);
+    } else if (raw.toLowerCase() === 'yes' && evidence) {
+      setExtracted(key, evidence, evidence);
+    } else if (raw.trim()) {
+      setExtracted(key, raw.trim(), evidence);
+    }
+  });
+
+  // Blood pressure: allow numeric strings returned by the AI.
+  const bp = found?.bp || {};
+
+  const rawSystolic =
+    bp.systolic == null || bp.systolic === ''
+      ? null
+      : Number(bp.systolic);
+
+  const rawDiastolic =
+    bp.diastolic == null || bp.diastolic === ''
+      ? null
+      : Number(bp.diastolic);
+
+  const systolic = Number.isFinite(rawSystolic)
+    ? rawSystolic
+    : null;
+
+  const diastolic = Number.isFinite(rawDiastolic)
+    ? rawDiastolic
+    : null;
 
   state.bp = {
     systolic,
     diastolic,
     aiSystolic: systolic,
     aiDiastolic: diastolic,
-    evidence:
-      bp && typeof bp.evidence === 'string'
-        ? bp.evidence
-        : null
+    evidence: typeof bp.evidence === 'string'
+      ? bp.evidence
+      : ''
   };
 }
 
 
 /* ==========================================================
-   9. SCREEN 2 — REVIEW ANSWERS
+   10. SCREEN 2 — REVIEW ANSWERS
    ========================================================== */
 
 function bpBand(systolic, diastolic) {
-  if (systolic == null || diastolic == null) {
-    return '';
-  }
+  if (systolic == null || diastolic == null) return '';
 
   if (systolic >= 160 || diastolic >= 100) {
-    return 'Reading band: 160/100 or above';
+    return 'Reading band: 160/100 or above (demo indicator)';
   }
 
   if (systolic >= 140 || diastolic >= 90) {
-    return 'Reading band: 140–159 / 90–99';
+    return 'Reading band: 140–159 / 90–99 (demo indicator)';
   }
 
-  return 'Reading band: below 140/90';
+  return 'Reading band: below 140/90 (demo indicator)';
 }
 
 function bpProblem() {
   const { systolic, diastolic } = state.bp;
 
-  if (systolic == null && diastolic == null) {
-    return '';
-  }
+  if (systolic == null && diastolic == null) return '';
 
   if (systolic == null || diastolic == null) {
     return 'Enter both numbers, or leave both blank.';
@@ -486,15 +916,20 @@ function bpProblem() {
   return '';
 }
 
+function createLabelledInput(q, input) {
+  input.id = `${q.field}-input`;
+  input.name = q.field;
+  input.setAttribute('aria-label', q.label);
+  return input;
+}
+
 function renderAnswers() {
   const list = $('answerList');
-
   list.innerHTML = '';
-  
 
   $('answersLede').textContent = state.extracted
-    ? 'The local AI filled these in from the notes. Check each one and change anything that is wrong.'
-    : 'Fill in each answer. Anything left blank counts as not sure.';
+    ? 'The local AI filled in any details it recognised. Check every answer and correct anything inaccurate.'
+    : 'Fill in the available information. Leave details blank if they are not known.';
 
   QUESTIONS.forEach((q) => {
     const row = document.createElement('div');
@@ -505,66 +940,130 @@ function renderAnswers() {
     row.setAttribute('aria-describedby', `${q.field}-hint`);
 
     const text = document.createElement('div');
+    const label = document.createElement('p');
 
-    text.innerHTML =
-      `<p class="q-label">` +
-      `<span id="${q.field}-label">${q.label}</span>` +
-      `<span class="tag" hidden></span>` +
-      `</p>` +
-      `<p class="q-hint" id="${q.field}-hint">${q.hint}</p>`;
+    label.className = 'q-label';
 
+    const labelSpan = document.createElement('span');
+    labelSpan.id = `${q.field}-label`;
+    labelSpan.textContent = q.label;
+
+    const tag = document.createElement('span');
+    tag.className = 'tag';
+    tag.hidden = true;
+
+    label.append(labelSpan, tag);
+
+    const hint = document.createElement('p');
+    hint.className = 'q-hint';
+    hint.id = `${q.field}-hint`;
+    hint.textContent = q.hint;
+
+    text.append(label, hint);
     row.appendChild(text);
 
     const evidence = document.createElement('p');
-
     evidence.className = 'evidence';
     evidence.hidden = true;
 
     let note = null;
 
-    if (q.type === 'choice') {
-      const choices = document.createElement('div');
+    if (q.type === 'select') {
+      const select = document.createElement('select');
 
-      choices.className = 'choices';
+      createLabelledInput(q, select);
 
-      CHOICES.forEach(([value, labelText]) => {
-        const label = document.createElement('label');
+      const placeholder = document.createElement('option');
+      placeholder.value = '';
+      placeholder.textContent = 'Choose an answer…';
 
-        label.innerHTML =
-          `<input type="radio" name="${q.field}" value="${value}">` +
-          `<span>${labelText}</span>`;
+      select.appendChild(placeholder);
 
-        const input = label.querySelector('input');
+      q.options.forEach(([value, labelText]) => {
+        const option = document.createElement('option');
 
-        input.checked =
-          state.answers[q.field].value === value;
+        option.value = value;
+        option.textContent = labelText;
 
-        input.addEventListener('change', () => {
-          state.answers[q.field].value = value;
-
-          refreshRow(q);
-          updateProgress();
-        });
-
-        choices.appendChild(label);
+        select.appendChild(option);
       });
 
-      row.appendChild(choices);
-    } else {
-      const bp = document.createElement('div');
+      select.value = state.answers[q.field].value ?? '';
 
+      select.addEventListener('change', () => {
+        updateAnswer(q, select.value || null);
+      });
+
+      row.appendChild(select);
+
+    } else if (q.type === 'number') {
+      const input = document.createElement('input');
+
+      input.type = 'number';
+      input.inputMode = 'numeric';
+
+      if (q.min != null) input.min = String(q.min);
+      if (q.max != null) input.max = String(q.max);
+
+      createLabelledInput(q, input);
+
+      input.value = state.answers[q.field].value ?? '';
+
+      input.addEventListener('input', () => {
+        updateAnswer(q, input.value);
+      });
+
+      row.appendChild(input);
+
+    } else if (q.type === 'text') {
+      const textarea = document.createElement('textarea');
+
+      textarea.rows = 2;
+
+      createLabelledInput(q, textarea);
+
+      textarea.value = state.answers[q.field].value ?? '';
+
+      textarea.addEventListener('input', () => {
+        updateAnswer(q, textarea.value);
+      });
+
+      row.appendChild(textarea);
+
+    } else if (q.type === 'bp') {
+      const bp = document.createElement('div');
       bp.className = 'bp';
 
-      bp.innerHTML =
-        `<input type="number" inputmode="numeric" id="bp-sys" ` +
-        `aria-label="Top number (systolic)" min="40" max="300">` +
-        `<span class="sep" aria-hidden="true">/</span>` +
-        `<input type="number" inputmode="numeric" id="bp-dia" ` +
-        `aria-label="Bottom number (diastolic)" min="20" max="200">` +
-        `<span class="unit">mmHg</span>`;
+      const systolic = document.createElement('input');
 
-      const systolic = bp.querySelector('#bp-sys');
-      const diastolic = bp.querySelector('#bp-dia');
+      systolic.type = 'number';
+      systolic.inputMode = 'numeric';
+      systolic.id = 'bp-sys';
+      systolic.min = '40';
+      systolic.max = '300';
+      systolic.setAttribute('aria-label', 'Top number (systolic)');
+      systolic.placeholder = 'Systolic';
+
+      const separator = document.createElement('span');
+
+      separator.className = 'sep';
+      separator.setAttribute('aria-hidden', 'true');
+      separator.textContent = '/';
+
+      const diastolic = document.createElement('input');
+
+      diastolic.type = 'number';
+      diastolic.inputMode = 'numeric';
+      diastolic.id = 'bp-dia';
+      diastolic.min = '20';
+      diastolic.max = '200';
+      diastolic.setAttribute('aria-label', 'Bottom number (diastolic)');
+      diastolic.placeholder = 'Diastolic';
+
+      const unit = document.createElement('span');
+
+      unit.className = 'unit';
+      unit.textContent = 'mmHg';
 
       systolic.value = state.bp.systolic ?? '';
       diastolic.value = state.bp.diastolic ?? '';
@@ -583,23 +1082,22 @@ function renderAnswers() {
       systolic.addEventListener('input', onType);
       diastolic.addEventListener('input', onType);
 
+      bp.append(systolic, separator, diastolic, unit);
       row.appendChild(bp);
 
       note = document.createElement('p');
       note.className = 'bp-note';
       note.setAttribute('role', 'status');
-    }
 
-    row.appendChild(evidence);
-
-    if (note) {
       row.appendChild(note);
     }
 
+    row.appendChild(evidence);
     list.appendChild(row);
 
     rowRefs[q.field] = {
-      tag: row.querySelector('.tag'),
+      row,
+      tag,
       evidence,
       note
     };
@@ -608,101 +1106,118 @@ function renderAnswers() {
   });
 
   $('answersError').textContent = '';
-
   updateProgress();
 }
 
+function updateAnswer(q, value) {
+  state.answers[q.field].value = value;
 
-/* ==========================================================
-   10. AI TAGS AND EVIDENCE
-   ========================================================== */
+  refreshRow(q);
+  updateProgress();
+}
 
 function refreshRow(q) {
   const ref = rowRefs[q.field];
 
-  let changed;
-  let evidenceText;
-  let foundInNotes;
+  if (!ref) return;
 
-  if (q.type === 'choice') {
-    const answer = state.answers[q.field];
+  let evidenceText = '';
+  let changed = false;
+  let foundInNotes = false;
 
-    changed = answer.value !== answer.aiValue;
-    evidenceText = answer.evidence;
-    foundInNotes = answer.aiValue !== null;
-  } else {
+  if (q.type === 'bp') {
     const bp = state.bp;
 
     changed =
       bp.systolic !== bp.aiSystolic ||
       bp.diastolic !== bp.aiDiastolic;
 
-    evidenceText = bp.evidence;
+    evidenceText = bp.evidence || '';
 
     foundInNotes =
-      bp.aiSystolic !== null &&
+      bp.aiSystolic !== null ||
       bp.aiDiastolic !== null;
 
     const problem = bpProblem();
 
-    ref.note.textContent =
-      problem || bpBand(bp.systolic, bp.diastolic);
+    if (ref.note) {
+      ref.note.textContent =
+        problem || bpBand(bp.systolic, bp.diastolic);
 
-    ref.note.classList.toggle('error', Boolean(problem));
+      ref.note.classList.toggle('error', Boolean(problem));
+    }
+
+  } else {
+    const answer = state.answers[q.field];
+
+    changed = answer.value !== answer.aiValue;
+    evidenceText = answer.evidence || '';
+
+    foundInNotes =
+      answer.aiValue !== null &&
+      answer.aiValue !== '';
   }
 
   if (!state.extracted) {
     ref.tag.hidden = true;
+
   } else if (changed) {
     ref.tag.hidden = false;
     ref.tag.textContent = 'You changed this';
     ref.tag.classList.add('edited');
+
   } else if (foundInNotes) {
     ref.tag.hidden = false;
     ref.tag.textContent = 'From notes';
     ref.tag.classList.remove('edited');
+
   } else {
     ref.tag.hidden = true;
+    ref.tag.classList.remove('edited');
   }
 
   if (!state.extracted) {
     ref.evidence.hidden = true;
+
   } else if (foundInNotes && evidenceText) {
     ref.evidence.hidden = false;
     ref.evidence.classList.remove('missing');
 
     ref.evidence.textContent =
       `The notes said: “${evidenceText}”`;
+
   } else if (!foundInNotes && !changed) {
     ref.evidence.hidden = false;
     ref.evidence.classList.add('missing');
 
-    ref.evidence.textContent =
-      q.type === 'bp'
-        ? 'Not in the notes. Take a reading.'
-        : 'Not in the notes. Ask the patient.';
+    ref.evidence.textContent = q.type === 'bp'
+      ? 'Not in the notes. Take a reading if appropriate.'
+      : 'Not identified in the notes. Confirm with the patient.';
+
   } else {
     ref.evidence.hidden = true;
   }
 }
 
-function countAnswered() {
-  let count = 0;
-
-  QUESTIONS.forEach((q) => {
-    if (q.type === 'choice') {
-      if (state.answers[q.field].value !== null) {
-        count++;
-      }
-    } else if (
+function isAnswered(q) {
+  if (q.type === 'bp') {
+    return (
       state.bp.systolic != null &&
       state.bp.diastolic != null
-    ) {
-      count++;
-    }
-  });
+    );
+  }
 
-  return count;
+  const value = state.answers[q.field]?.value;
+
+  return (
+    value !== null &&
+    value !== undefined &&
+    String(value).trim() !== ''
+  );
+}
+
+function countAnswered() {
+  return QUESTIONS.filter(isAnswered).length;
 }
 
 function updateProgress() {
@@ -718,20 +1233,47 @@ function updateProgress() {
 function flatAnswers() {
   const answers = {};
 
-  QUESTIONS
-    .filter((q) => q.type === 'choice')
-    .forEach((q) => {
-      answers[q.field] =
-        state.answers[q.field].value || 'unknown';
-    });
+  QUESTIONS.forEach((q) => {
+    if (q.type === 'bp') return;
 
-  const validBP = bpProblem() === '';
+    let value = state.answers[q.field]?.value;
 
-  answers.bp_systolic =
-    validBP ? state.bp.systolic : null;
+    if (q.type === 'number') {
+      value =
+        value === '' || value == null
+          ? null
+          : Number(value);
 
-  answers.bp_diastolic =
-    validBP ? state.bp.diastolic : null;
+      if (value !== null && !Number.isFinite(value)) {
+        value = null;
+      }
+
+    } else if (q.type === 'text') {
+      value = typeof value === 'string'
+        ? value.trim()
+        : '';
+
+      if (!value) value = null;
+
+    } else if (value === '') {
+      value = null;
+    }
+
+    answers[q.field] = value;
+  });
+
+  const validBP =
+    bpProblem() === '' &&
+    state.bp.systolic != null &&
+    state.bp.diastolic != null;
+
+  answers.bp_systolic = validBP
+    ? state.bp.systolic
+    : null;
+
+  answers.bp_diastolic = validBP
+    ? state.bp.diastolic
+    : null;
 
   return answers;
 }
@@ -748,7 +1290,6 @@ $('seeResult').addEventListener('click', () => {
       `Blood pressure: ${problem}`;
 
     $('bp-sys').focus();
-
     return;
   }
 
@@ -774,18 +1315,17 @@ function renderResult() {
   $('resultSummary').textContent = text.summary;
 
   const reasons = $('reasons');
-
   reasons.innerHTML = '';
 
   result.reasons.forEach((reason) => {
     const li = document.createElement('li');
 
     li.textContent = reason;
+
     reasons.appendChild(li);
   });
 
   const followups = $('followups');
-
   followups.innerHTML = '';
 
   result.followups.forEach((item) => {
@@ -799,6 +1339,7 @@ function renderResult() {
 
     label.append(checkbox, span);
     li.appendChild(label);
+
     followups.appendChild(li);
   });
 }
@@ -838,8 +1379,12 @@ function renderSheet() {
 
   QUESTIONS.forEach((q) => {
     if (q.type === 'bp') {
-      if (answers.bp_systolic == null) {
+      if (
+        answers.bp_systolic == null ||
+        answers.bp_diastolic == null
+      ) {
         stillToCheck.push('Your blood pressure');
+
       } else if (
         answers.bp_systolic >= 140 ||
         answers.bp_diastolic >= 90
@@ -852,17 +1397,52 @@ function renderSheet() {
       return;
     }
 
-    if (answers[q.field] === 'yes') {
-      discussed.push(PATIENT_WORDING[q.field]);
+    const value = answers[q.field];
+
+    if (value == null || value === 'unknown') {
+      stillToCheck.push(q.label);
+      return;
     }
 
-    if (answers[q.field] === 'unknown') {
-      stillToCheck.push(q.label);
+    if (q.type === 'text') {
+      if (value.trim()) {
+        discussed.push(
+          PATIENT_WORDING[q.field] || `${q.label}: ${value}`
+        );
+      } else {
+        stillToCheck.push(q.label);
+      }
+
+      return;
+    }
+
+    if (q.type === 'number') {
+      if (value !== null) {
+        discussed.push(`${q.label}: ${value}.`);
+      } else {
+        stillToCheck.push(q.label);
+      }
+
+      return;
+    }
+
+    const neutralValues = [
+      'none',
+      'non_smoker',
+      'no',
+      'gestational_history',
+      'family_history_only'
+    ];
+
+    if (!neutralValues.includes(value)) {
+      discussed.push(
+        PATIENT_WORDING[q.field] ||
+        `${q.label} needs review.`
+      );
     }
   });
 
   const body = $('sheetBody');
-
   body.innerHTML = '';
 
   function addList(title, items) {
@@ -877,6 +1457,7 @@ function renderSheet() {
       const li = document.createElement('li');
 
       li.textContent = item;
+
       ul.appendChild(li);
     });
 
@@ -912,6 +1493,7 @@ $('newPatient').addEventListener('click', () => {
   $('notes').value = '';
   $('readStatus').textContent = '';
 
+  renderAnswers();
   go('notes');
 });
 
@@ -926,7 +1508,10 @@ textSizeBtn.addEventListener('click', () => {
   const large =
     document.documentElement.classList.toggle('large');
 
-  textSizeBtn.setAttribute('aria-pressed', String(large));
+  textSizeBtn.setAttribute(
+    'aria-pressed',
+    String(large)
+  );
 
   textSizeBtn.textContent =
     large ? 'Normal text' : 'Larger text';

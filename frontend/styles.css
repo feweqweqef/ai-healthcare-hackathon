@@ -132,7 +132,11 @@ h1 {
 .status.error { color: var(--red-text); font-weight: 700; }
 
 /* ---------- Notes box ---------- */
-textarea {
+/* ---------- Notes box ---------- */
+/* ---------- Form controls ---------- */
+
+/* Large consultation notes box only */
+#notes {
   display: block;
   width: 100%;
   min-height: 14rem;
@@ -144,6 +148,65 @@ textarea {
   border: 2px solid var(--ink);
   border-radius: 12px;
   resize: vertical;
+}
+
+/* Dynamically generated questionnaire controls */
+.q select,
+.q input[type="number"],
+.q textarea {
+  width: 100%;
+  min-width: 0;
+  padding: 0.65rem 0.75rem;
+  font: inherit;
+  line-height: 1.4;
+  color: var(--ink);
+  background: var(--white);
+  border: 2px solid var(--ink);
+  border-radius: 10px;
+}
+
+/* Keep medicine and allergy text boxes compact */
+.q textarea {
+  min-height: 3.5rem;
+  resize: vertical;
+}
+
+/* Keep blood pressure inputs compact */
+.q .bp input {
+  width: 6rem;
+  min-width: 0;
+  padding: 0.5rem;
+  font: inherit;
+  text-align: center;
+  color: var(--ink);
+  background: var(--white);
+  border: 2px solid var(--ink);
+  border-radius: 10px;
+}
+
+/* Focus indication */
+.q select:focus-visible,
+.q input:focus-visible,
+.q textarea:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Keep BP controls on one line when possible */
+.bp {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.bp .sep,
+.bp .unit {
+  color: var(--muted);
+}
+
+.bp .unit {
+  font-size: 0.85rem;
 }
 
 /* ---------- Buttons ---------- */
