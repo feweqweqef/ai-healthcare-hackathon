@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/feweqweqef/ai-healthcare-hackathon#readme",
   "dependencies": {
+    "csv-parse": "^7.0.3",
     "express": "^5.3.0"
   }
 }

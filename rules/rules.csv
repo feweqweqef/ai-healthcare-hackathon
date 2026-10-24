@@ -1,0 +1,56 @@
+field,allowed_value,category,reason,followup,source
+age,under_40,1,No age restriction,,UKMEC 2025 p.57
+age,40_to_50,2,Benefits generally outweigh risks,,p.57
+bmi,under_30,1,No weight-related restriction,,p.58–59
+bmi,30_to_34.9,2,Higher BMI slightly raises clot risk,Discuss clot risk,p.58–59
+bmi,35_plus,3,Clot risk usually outweighs benefits,Consider other methods,p.58–59
+smoking,non_smoker,1,Not a smoker,,p.58
+smoking,under_35,2,Smoking raises heart and clot risk,Offer stop-smoking support,p.58
+smoking,35plus_under_15,3,Heart attack risk rises with smoking,Offer stop-smoking support,p.58
+smoking,35plus_15_plus,4,Unacceptable heart risk,Do not prescribe combined pill,p.58
+smoking,35plus_stopped_under_1yr,3,Risk stays raised after stopping,Offer support to stay stopped,p.58
+smoking,35plus_stopped_1yr_plus,2,Risk has mostly fallen,,p.58
+migraine_aura,none,1,No migraine,,Table 6 (Headaches)
+migraine_aura,without_aura,2,Slightly higher stroke risk,Explain stroke warning signs,Table 6 (Headaches)
+migraine_aura,with_aura,4,Migraine with aura raises stroke risk,Do not prescribe combined pill,Table 6 (Headaches)
+migraine_aura,aura_history_5plus_years,3,Past aura still carries risk,Consider other methods,Table 6 (Headaches)
+high_bp,normal,1,Blood pressure normal,,p.60
+high_bp,controlled_hypertension,3,Risk usually outweighs benefits,Consider other methods,p.60
+high_bp,stage_1,3,Risk usually outweighs benefits,"Repeat BP, consider other methods",p.60
+high_bp,stage_2_or_3,4,Unacceptable heart and stroke risk,Do not prescribe combined pill,p.60
+high_bp,vascular_disease,4,Unacceptable risk,Do not prescribe combined pill,p.60
+family_clots,none,1,No family history of clots,,Table 6 (VTE risk factors)
+family_clots,first_degree,3,Close relative had a clot,Consider specialist advice,Table 6 (VTE risk factors)
+diabetes,none,1,No diabetes,,p.68
+diabetes,gestational_history,1,No added risk,,p.68
+diabetes,non_vascular,2,Benefits generally outweigh risks,Monitor BP,p.68
+diabetes,with_complications,3,"Damage to eyes, nerves or kidneys raises risk",Consider other methods,p.68
+diabetes,other_vascular_disease,3,Vascular disease raises risk,Consider other methods,p.68
+liver_disease,none,1,No liver disease,,UKMEC 2025 p.69
+liver_disease,viral_hepatitis_acute,3,Acute or flare of viral hepatitis: risks usually outweigh benefits when starting,Consider other methods,p.69
+liver_disease,carrier_or_chronic,1,Carrier or chronic viral hepatitis,,p.69
+liver_disease,cirrhosis_mild,1,"Mild cirrhosis, no complications",,p.69
+liver_disease,cirrhosis_severe,4,Severe cirrhosis with complications: unacceptable risk,Do not prescribe combined pill,p.69
+liver_disease,benign_tumour_fnh,2,Benign focal nodular hyperplasia: benefits generally outweigh risks,,p.70
+liver_disease,adenoma_or_malignant,4,Liver adenoma or liver cancer: unacceptable risk,Do not prescribe combined pill,p.70
+breast_cancer,none,1,No history,,p.65–66
+breast_cancer,family_history_only,1,No restriction,,p.65–66
+breast_cancer,brca_carrier,3,Risk usually outweighs benefits,Refer to specialist,p.65–66
+breast_cancer,completed_treatment,3,Hormones generally avoided after breast cancer,Refer to specialist,p.65–66
+breast_cancer,current_treatment,4,Unacceptable risk,Do not prescribe combined pill,p.65–66
+personal_clots,none,1,No personal history of clots,,UKMEC 2025 p.61
+personal_clots,current_or_history,4,Current or past DVT or PE: unacceptable risk,Do not prescribe combined pill,UKMEC 2025 p.61
+clotting_disorder,none,1,No known clotting disorder,,UKMEC 2025 p.62
+clotting_disorder,known_inherited_or_acquired,4,Known clotting mutation (e.g. factor V Leiden): unacceptable risk,Do not prescribe combined pill,UKMEC 2025 p.62
+major_surgery_immobilisation,none,1,No planned or recent major surgery,,UKMEC 2025 p.61
+major_surgery_immobilisation,planned_or_recent,4,Major surgery with long immobilisation: unacceptable clot risk,"Stop pill 4 weeks before elective surgery, use another method, restart 2 weeks after full mobilisation",UKMEC 2025 p.61
+heart_or_stroke_history,none,1,No history of heart disease or stroke,,UKMEC 2025 p.60
+heart_or_stroke_history,current_or_history,4,"Current or past ischaemic heart disease, stroke or TIA: unacceptable risk",Do not prescribe combined pill,UKMEC 2025 p.60
+other_meds,none,NA,No other medicines,,p.4
+other_meds,yes,NA,Some medicines affect the pill,Check CoSRH guideline and BNF,p.4
+other_meds,anti_epileptic,NA,Can change hormone levels,Check Stockley’s interaction checker,Table 6 (Epilepsy)
+other_meds,hiv_antiretroviral,NA,Can change hormone levels,Check Liverpool HIV interaction checker,p.4
+other_meds,hep_c_antivirals,,Hepatitis C medicines raise liver enzymes with the pill,Switch to another method before starting,"SmPC 4.3, 4.5 (not in UKMEC)"
+allergies,none,NA,No known allergies,,
+allergies,yes,NA,Allergy may relate to an ingredient,Check against the product’s ingredients (SmPC),
+combination,2_or_more_cvd_risk_factors,3,Several heart risk factors add up,Use clinical judgement,p.59

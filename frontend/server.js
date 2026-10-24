@@ -1,7 +1,15 @@
 const express = require("express");
 
+const {
+  loadClinicalRules,
+  checkUkMecRules,
+  checkContraindications,
+  checkInteractions
+} = require("./clinical-engine");
+
 const app = express();
 const PORT = 3000;
+const clinicalRules = loadClinicalRules();
 
 app.use(express.json({ limit: "1mb" }));
 app.use(express.static(__dirname));
@@ -391,6 +399,228 @@ Return only the requested JSON.`
 });
 
 app.listen(PORT, () => {
+  // Check extracted answers against the CSV-based clinical rules.
+// Hackathon prototype only — not a clinical decision or prescribing tool.
+app.post("/api/check", (req, res) => {
+  try {
+    const answers = req.body.answers;
+
+    if (!answers || typeof answers !== "object") {
+      return res.status(400).json({
+        error: "Expected an answers object."
+      });
+    }
+
+    const facts = {};
+
+    // Convert numeric inputs safely.
+    const numberOrNull = (value) => {
+      if (value === null || value === undefined || value === "") {
+        return null;
+      }
+
+      const number = Number(value);
+      return Number.isFinite(number) ? number : null;
+    };
+
+    const age = numberOrNull(answers.age);
+    const height = numberOrNull(answers.height_cm);
+    const weight = numberOrNull(answers.weight_kg);
+    const systolic = numberOrNull(answers.bp_systolic);
+    const diastolic = numberOrNull(answers.bp_diastolic);
+    const cigarettes = numberOrNull(answers.cigarettes_per_day);
+
+    // Age category.
+    if (age !== null && age >= 0 && age < 40) {
+      facts.age = "under_40";
+    } else if (age !== null && age >= 40 && age <= 50) {
+      facts.age = "40_to_50";
+    }
+
+    // BMI category.
+    if (height !== null && height > 0 && weight !== null && weight > 0) {
+      const bmi = weight / ((height / 100) ** 2);
+
+      if (bmi < 30) facts.bmi = "under_30";
+      else if (bmi < 35) facts.bmi = "30_to_34.9";
+      else facts.bmi = "35_plus";
+    }
+
+    // Smoking category.
+    const smokingStatus = answers.smoking_status;
+
+    if (smokingStatus === "non_smoker") {
+      facts.smoking = "non_smoker";
+    } else if (age !== null && age < 35 &&
+               smokingStatus === "current_smoker") {
+      facts.smoking = "under_35";
+    } else if (age !== null && age >= 35 &&
+               smokingStatus === "current_smoker" &&
+               cigarettes !== null && cigarettes >= 15) {
+      facts.smoking = "35plus_15_plus";
+    } else if (age !== null && age >= 35 &&
+               smokingStatus === "current_smoker" &&
+               cigarettes !== null && cigarettes >= 0 &&
+               cigarettes < 15) {
+      facts.smoking = "35plus_under_15";
+    } else if (age !== null && age >= 35 &&
+               smokingStatus === "stopped_under_1yr") {
+      facts.smoking = "35plus_stopped_under_1yr";
+    } else if (age !== null && age >= 35 &&
+               smokingStatus === "stopped_1yr_plus") {
+      facts.smoking = "35plus_stopped_1yr_plus";
+    }
+
+    // Migraine.
+    if (answers.migraine_aura &&
+        answers.migraine_aura !== "unknown") {
+      facts.migraine_aura = answers.migraine_aura;
+    }
+
+    // Blood pressure.
+    if (systolic !== null && diastolic !== null) {
+      if (systolic >= 160 || diastolic >= 100) {
+        facts.high_bp = "stage_2_or_3";
+      } else if (systolic >= 140 || diastolic >= 90) {
+        facts.high_bp = "stage_1";
+      } else {
+        facts.high_bp = "normal";
+      }
+    }
+
+    // Map questionnaire answers to the values used in the CSVs.
+    const directMappings = [
+      "family_clots",
+      "personal_clots",
+      "clotting_disorder",
+      "major_surgery_immobilisation"
+    ];
+
+    for (const field of directMappings) {
+      if (answers[field] && answers[field] !== "unknown") {
+        facts[field] = answers[field];
+      }
+    }
+
+    // Any specified heart/stroke condition maps to the CSV category.
+    if (answers.heart_or_stroke_history === "none") {
+      facts.heart_or_stroke_history = "none";
+    } else if (
+      answers.heart_or_stroke_history &&
+      answers.heart_or_stroke_history !== "unknown"
+    ) {
+      facts.heart_or_stroke_history = "current_or_history";
+    }
+
+    // Preserve only explicitly selected diabetes categories.
+    if (answers.diabetes && answers.diabetes !== "unknown") {
+      facts.diabetes = answers.diabetes;
+    }
+
+    if (answers.liver_disease && answers.liver_disease !== "unknown") {
+      facts.liver_disease = answers.liver_disease;
+    }
+
+    if (answers.breast_cancer && answers.breast_cancer !== "unknown") {
+      facts.breast_cancer = answers.breast_cancer;
+    }
+
+    // Allergy answers: a non-empty allergy description requires review.
+    const allergyText = String(answers.allergies || "").trim();
+
+    if (/^(no|none|no known allergies)$/i.test(allergyText)) {
+      facts.allergies = "none";
+    } else if (allergyText) {
+      facts.allergies = "yes";
+    }
+
+    // Check whether the user reports hepatitis C antiviral treatment.
+    if (answers.hep_c_antivirals === "yes") {
+      facts.other_meds = "hep_c_antivirals";
+    }
+
+    // Identify required answers that are missing or unknown.
+const requiredFields = [
+  "age",
+  "height_cm",
+  "weight_kg",
+  "smoking_status",
+  "migraine_aura",
+  "bp_systolic",
+  "bp_diastolic",
+  "personal_clots",
+  "family_clots",
+  "clotting_disorder",
+  "major_surgery_immobilisation",
+  "heart_or_stroke_history",
+  "diabetes",
+  "liver_disease",
+  "breast_cancer",
+  "other_meds",
+  "hep_c_antivirals",
+  "allergies"
+];
+
+const missingFields = requiredFields.filter(field => {
+  const value = answers[field];
+
+  return (
+    value === null ||
+    value === undefined ||
+    value === "" ||
+    value === "unknown"
+  );
+});
+
+// Cigarette count is required for current smokers aged 35+.
+if (
+  smokingStatus === "current_smoker" &&
+  age !== null &&
+  age >= 35 &&
+  cigarettes === null
+) {
+  missingFields.push("cigarettes_per_day");
+}
+
+    // Run the CSV-based checks.
+    const ukmecFindings = checkUkMecRules(facts, clinicalRules);
+    const contraindicationFindings =
+      checkContraindications(facts, clinicalRules);
+
+    // Avoid interpreting phrases such as "no regular medicines"
+    // as actual medication names.
+    const medicationText = String(answers.other_meds || "").trim();
+
+    const noMedicationReported =
+      /^(no|none|no regular medicines|not on any regular medicines|no medications|no medication)$/i
+        .test(medicationText);
+
+    const medications = noMedicationReported || !medicationText
+      ? []
+      : medicationText
+          .split(/[,;\n]+/)
+          .map(name => name.trim())
+          .filter(Boolean);
+
+    const interactionFindings =
+      checkInteractions(medications, clinicalRules);
+
+  return res.json({
+  facts,
+  missingFields,
+  ukmecFindings,
+  contraindicationFindings,
+  interactionFindings,
+  prototypeOnly: true
+});
+  } catch (error) {
+    console.error("Clinical check error:", error);
+
+    return res.status(500).json({
+      error: "Unable to check the answers against the rules."
+    });
+  }
+});
   console.log(`Server running at http://localhost:${PORT}`);
   console.log("Hackathon prototype only. Use fictional notes.");
 });

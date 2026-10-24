@@ -1,0 +1,18 @@
+drug,method,field,allowed_value,effect,reason,followup,source
+Microgynon 30,combined_hormonal,personal_clots,current_or_history,contraindicated,Current or past blood clot in a vein (DVT or PE),Do not prescribe combined pill,SmPC 4.3
+Microgynon 30,combined_hormonal,clotting_disorder,known_inherited_or_acquired,contraindicated,"Known inherited or acquired clotting tendency (e.g. factor V Leiden, protein C or S or antithrombin deficiency, antiphospholipid antibodies, hyperhomocysteinaemia)",Do not prescribe combined pill,SmPC 4.3
+Microgynon 30,combined_hormonal,major_surgery_immobilisation,planned_or_recent,contraindicated,Major surgery with prolonged immobilisation,"Stop the pill at least 4 weeks before elective surgery, use another method, restart 2 weeks after full mobilisation","SmPC 4.3, 4.4"
+Microgynon 30,combined_hormonal,heart_or_stroke_history,current_or_history,contraindicated,"Current or past arterial clot, heart attack, angina, stroke or TIA",Do not prescribe combined pill,SmPC 4.3
+Microgynon 30,combined_hormonal,migraine_aura,with_aura,contraindicated,History of migraine with focal neurological symptoms (aura),Do not prescribe combined pill,SmPC 4.3
+Microgynon 30,combined_hormonal,migraine_aura,aura_history_5plus_years,contraindicated,History of migraine with focal neurological symptoms (aura),Do not prescribe combined pill,SmPC 4.3
+Microgynon 30,combined_hormonal,diabetes,other_vascular_disease,contraindicated,Diabetes with vascular symptoms,Do not prescribe combined pill,SmPC 4.3
+Microgynon 30,combined_hormonal,high_bp,stage_2_or_3,contraindicated,Severe hypertension (SmPC does not define 'severe'; mapped to stage 2 or 3),Do not prescribe combined pill,SmPC 4.3
+Microgynon 30,combined_hormonal,liver_disease,viral_hepatitis_acute,contraindicated,Active viral hepatitis until liver tests return to normal,Do not prescribe combined pill,SmPC 4.3
+Microgynon 30,combined_hormonal,liver_disease,cirrhosis_severe,contraindicated,Severe cirrhosis until liver tests return to normal,Do not prescribe combined pill,SmPC 4.3
+Microgynon 30,combined_hormonal,liver_disease,benign_tumor_fnh,contraindicated,"Current or past liver tumour, benign or malignant",Do not prescribe combined pill,SmPC 4.3
+Microgynon 30,combined_hormonal,liver_disease,adenoma_or_malignant,contraindicated,"Current or past liver tumour, benign or malignant",Do not prescribe combined pill,SmPC 4.3
+Microgynon 30,combined_hormonal,breast_cancer,current_treatment,contraindicated,Current or past breast cancer,Do not prescribe combined pill,SmPC 4.3
+Microgynon 30,combined_hormonal,breast_cancer,completed_treatment,contraindicated,Current or past breast cancer,Do not prescribe combined pill,SmPC 4.3
+Microgynon 30,combined_hormonal,other_meds,hep_c_antivirals,contraindicated,hepatitis C regimens (ombitasvir/paritaprevir/ritonavir with dasabuvir; glecaprevir/pibrentasvir; sofosbuvir/velpatasvir/voxilaprevir) raise liver enzymes,Switch to progestogen-only or non-hormonal contraception first; pill can restart 2 weeks after treatment ends,"SmPC 4.3, 4.5"
+Microgynon 30,combined_hormonal,allergies,yes,doctor_to_confirm,"Contraindicated only if allergic to levonorgestrel, ethinylestradiol or any excipient (includes lactose and sucrose)",Check the allergy against the ingredient list,"SmPC 4.3, 6.1"
+Microgynon 30,combined_hormonal,combination,2_or_more_cvd_risk_factors,doctor_to_confirm,Contraindicated if multiple risk factors put her at high risk of clots or arterial thrombosis; SmPC says do not prescribe if the balance of benefits and risks is negative,Doctor to weigh her total risk,"SmPC 4.3, 4.4"

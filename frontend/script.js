@@ -1282,7 +1282,7 @@ $('backToNotes').addEventListener('click', () => {
   go('notes');
 });
 
-$('seeResult').addEventListener('click', () => {
+$('seeResult').addEventListener('click', async () => {
   const problem = bpProblem();
 
   if (problem) {
@@ -1295,10 +1295,79 @@ $('seeResult').addEventListener('click', () => {
 
   $('answersError').textContent = '';
 
-  state.result = getResult(flatAnswers());
+  const button = $('seeResult');
+  button.disabled = true;
+  button.textContent = 'Checking rules…';
 
-  renderResult();
-  go('result');
+  try {
+    const response = await fetch('/api/check', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        answers: flatAnswers()
+      })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        data.error || 'The rule check failed.'
+      );
+    }
+
+    // Temporary diagnostic output.
+    // We will build the final traffic-light logic after
+    // verifying the API findings.
+state.result = {
+  status:
+  data.contraindicationFindings.some(f => f.status === 'contraindicated') ||
+  data.ukmecFindings.some(f => String(f.category) === '4')
+    ? 'red'
+    : data.missingFields.length > 0 ||
+      data.contraindicationFindings.length > 0 ||
+      data.interactionFindings.length > 0 ||
+      data.ukmecFindings.some(f =>
+        ['2', '3'].includes(String(f.category))
+      )
+        ? 'amber'
+        : 'green',
+  reasons: [
+    ...data.contraindicationFindings.map(
+      finding => finding.reason
+    ),
+    ...data.ukmecFindings
+      .filter(finding => finding.category === '3' || finding.category === '4')
+      .map(finding => `${finding.field}: ${finding.reason}`)
+  ],
+  followups: [
+    ...data.contraindicationFindings.map(
+      finding => finding.followup
+    ),
+    ...data.ukmecFindings
+      .filter(finding => finding.followup)
+      .map(finding => finding.followup)
+  ].filter(Boolean)
+};
+
+renderResult();
+go('result');
+
+    $('answersError').textContent =
+      'Rule checks completed. Open the browser console to inspect the findings.';
+
+  } catch (error) {
+    console.error('Rule check failed:', error);
+
+    $('answersError').textContent =
+      'Could not check the rules. Please try again.';
+
+  } finally {
+    button.disabled = false;
+    button.textContent = 'See result';
+  }
 });
 
 
@@ -1315,15 +1384,23 @@ function renderResult() {
   $('resultSummary').textContent = text.summary;
 
   const reasons = $('reasons');
-  reasons.innerHTML = '';
+reasons.innerHTML = '';
 
+if (result.reasons.length > 0) {
   result.reasons.forEach((reason) => {
     const li = document.createElement('li');
-
     li.textContent = reason;
-
     reasons.appendChild(li);
   });
+} else if (result.status === 'green') {
+  const li = document.createElement('li');
+  li.textContent = 'No flags detected by the implemented rules.';
+  reasons.appendChild(li);
+} else {
+  const li = document.createElement('li');
+  li.textContent = 'Review the findings and confirm any outstanding information.';
+  reasons.appendChild(li);
+}
 
   const followups = $('followups');
   followups.innerHTML = '';
