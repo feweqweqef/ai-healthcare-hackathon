@@ -41,8 +41,33 @@ Return valid JSON with exactly this structure:
 }
 For yes/no fields, use "yes" or "no" only when explicitly supported.
 
+IMPORTANT EXTRACTION RULES:
+
+1. Explicit negative statements MUST be extracted as "no".
+   Examples:
+   - "No history of breast cancer" -> breast_cancer = "no"
+   - "Not on any regular medicines" -> other_meds = "no"
+   - "Does not smoke" -> smoker = "no"
+
+2. Missing information MUST remain null.
+   Examples:
+   - "No diabetes mentioned" -> diabetes = null
+   - "Smoking status not documented" -> smoker = null
+   - "Medication history unavailable" -> other_meds = null
+
+3. Do not confuse "no history of X" with "no mention of X".
+   - "No history of breast cancer" explicitly denies breast cancer.
+   - "No breast cancer history documented" does not establish whether breast cancer is present.
+
+4. Review every requested field independently.
+   Do not skip fields near the end of the consultation notes.
+
+5. For every non-null answer, copy the exact supporting words
+   from the consultation notes into the evidence field.
+
 - Use null only when the notes do not provide enough information.
 - Do not treat missing information as "no".
+
 
 Examples:
 - "She has no history of breast cancer" means breast_cancer = "no".
@@ -59,12 +84,14 @@ Examples:
 - "Her mother had a DVT" means family_clots = "yes".
 - "No known allergies" means allergies = "no" for this prototype's general allergy question.
 
+DO NOT LIMIT TO THE EXAMPLES, notes can be rephrased and in different formats
+
 
 Evidence must be a short, exact quotation from the note, or "" if unknown.
 For blood pressure, use numeric systolic and diastolic values, or null if not stated.
 Do not infer missing facts or make clinical decisions.
 Do not treat missing information as "no".
-Return only the requested JSON.
+Return only the requested JSON
 `
           },
           {
@@ -81,6 +108,38 @@ Return only the requested JSON.
 
     const data = await response.json();
     const extracted = JSON.parse(data.message.content);
+
+    // Correct specific, explicitly stated negatives missed by Ollama.
+// Never assume that missing information means "no".
+
+function correctExplicitNegatives(field, patterns) {
+  if (extracted[field]?.value != null) return;
+
+  for (const pattern of patterns) {
+    const match = notes.match(pattern);
+
+    if (match) {
+      extracted[field] = {
+        value: "no",
+        evidence: match[0]
+      };
+      return;
+    }
+  }
+}
+
+correctExplicitNegatives("breast_cancer", [
+  /\bno (?:personal )?history of breast cancer\b/i,
+  /\b(?:denies|does not have) breast cancer\b/i
+]);
+
+correctExplicitNegatives("other_meds", [
+  /\bnot (?:on|taking) any regular (?:medicines|medications|meds)\b/i,
+  /\bno regular (?:medicines|medications|meds)\b/i
+]);
+
+    console.log("RAW OLLAMA EXTRACTION:");
+    console.log(JSON.stringify(extracted, null, 2));
 
     const fields = [
       "migraine_aura",
