@@ -7,10 +7,10 @@ Microgynon 30,combined_hormonal,migraine_aura,with_aura,contraindicated,History 
 Microgynon 30,combined_hormonal,migraine_aura,aura_history_5plus_years,contraindicated,History of migraine with focal neurological symptoms (aura),Do not prescribe combined pill,SmPC 4.3
 Microgynon 30,combined_hormonal,diabetes,other_vascular_disease,contraindicated,Diabetes with vascular symptoms,Do not prescribe combined pill,SmPC 4.3
 Microgynon 30,combined_hormonal,high_bp,stage_2_or_3,contraindicated,Severe hypertension (SmPC does not define 'severe'; mapped to stage 2 or 3),Do not prescribe combined pill,SmPC 4.3
-Microgynon 30,combined_hormonal,liver_disease,vural_hepatitis_acute,contradiction,Active viral hepatis until liver test return to normal,Do not prescribe combined pill,SmPC 4.3
-Microgynon 30,combined_hormonal,liver_disease,cirrhosis_severe,contradiction,Severe cirrhosis until livet test return to normal,Do not prescribe combined pill,SmPC 4.3
-Microgynon 30,combined_hormonal,liver_disease,benign_tumor_fnh,contradiction,"Current or past liver tumour, benign or malignant",Do not prescribe combined pill,SmPC 4.3
-Microgynon 30,combined_hormonal,liver_disease,adenoma_or_malignant,contradiction,"Current or past liver tumour, benign or malignant",Do not prescribe combined pill,SmPC 4.3
+Microgynon 30,combined_hormonal,liver_disease,vural_hepatitis_acute,contraindicated,Active viral hepatis until liver test return to normal,Do not prescribe combined pill,SmPC 4.3
+Microgynon 30,combined_hormonal,liver_disease,cirrhosis_severe,contraindicated,Severe cirrhosis until livet test return to normal,Do not prescribe combined pill,SmPC 4.3
+Microgynon 30,combined_hormonal,liver_disease,benign_tumor_fnh,contraindicated,"Current or past liver tumour, benign or malignant",Do not prescribe combined pill,SmPC 4.3
+Microgynon 30,combined_hormonal,liver_disease,adenoma_or_malignant,contraindicated,"Current or past liver tumour, benign or malignant",Do not prescribe combined pill,SmPC 4.3
 Microgynon 30,combined_hormonal,breast_cancer,current_treatment,contraindicated,Current or past breast cancer,Do not prescribe combined pill,SmPC 4.3
 Microgynon 30,combined_hormonal,breast_cancer,completed_treatment,contraindicated,Current or past breast cancer,Do not prescribe combined pill,SmPC 4.3
 Microgynon 30,combined_hormonal,other_meds,hep_c_antivirals,contraindicated,Hepatitis C regimens (ombitasvir/paritaprevir/ritonavir with dasabuvir; glecaprevir/pibrentasvir; sofosbuvir/velpatasvir/voxilaprevir) raise liver enzymes,Switch to progestogen-only or non-hormonal contraception first; pill can restart 2 weeks after treatment ends,"SmPC 4.3, 4.5"
