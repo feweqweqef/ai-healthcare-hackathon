@@ -46,6 +46,7 @@ major_surgery_immobilisation,none,1,No planned or recent major surgery,,UKMEC 20
 major_surgery_immobilisation,planned_or_recent,4,Major surgery with long immobilisation: unacceptable clot risk,"Stop pill 4 weeks before elective surgery, use another method, restart 2 weeks after full mobilisation",UKMEC 2025 p.61
 heart_or_stroke_history,none,1,No history of heart disease or stroke,,UKMEC 2025 p.60
 heart_or_stroke_history,current_or_history,4,"Current or past ischaemic heart disease, stroke or TIA: unacceptable risk",Do not prescribe combined pill,UKMEC 2025 p.60
+other_meds,none,NA,No other medicines
 other_meds,yes,NA,Some medicines affect the pill,Check CoSRH guideline and BNF,p.4
 other_meds,anti_epileptic,NA,Can change hormone levels,Check Stockley’s interaction checker,Table 6 (Epilepsy)
 other_meds,hiv_antiretroviral,NA,Can change hormone levels,Check Liverpool HIV interaction checker,p.4
