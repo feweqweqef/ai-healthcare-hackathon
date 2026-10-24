@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Combined pill check</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <div class="notice" role="note">Hackathon prototype. Not for clinical use.</div>
+
+  <header class="top">
+    <div>
+      <h1>Combined pill check</h1>
+      <p class="lede">Ask the patient eight questions. The doctor confirms every flag.</p>
+    </div>
+    <button type="button" class="text-size" id="textSize" aria-pressed="false">Larger text</button>
+  </header>
+
+  <main class="layout">
+
+    <form id="form" class="questions" novalidate>
+      <div id="questionList"></div>
+      <div class="actions">
+        <button type="submit" class="primary">Check answers</button>
+        <button type="button" class="quiet" id="clear">Clear answers</button>
+      </div>
+    </form>
+
+    <aside class="result" id="result" data-status="none">
+      <div class="lamp" aria-hidden="true">
+        <span class="bulb red"></span>
+        <span class="bulb amber"></span>
+        <span class="bulb green"></span>
+      </div>
+
+      <div class="headline" aria-live="polite">
+        <p class="progress" id="progress">0 of 8 answered</p>
+        <h2 id="resultTitle">No result yet</h2>
+        <p id="resultSummary">Answer the questions, then press Check answers. Anything left blank counts as not sure.</p>
+      </div>
+
+      <div class="detail" id="resultDetail" hidden>
+        <h3>Why</h3>
+        <ul id="reasons"></ul>
+
+        <h3>Talk through with the patient</h3>
+        <ul id="followups" class="checklist"></ul>
+
+        <label class="confirm">
+          <input type="checkbox" id="confirm">
+          <span>I have reviewed these flags with the patient</span>
+        </label>
+      </div>
+    </aside>
+
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
