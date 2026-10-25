@@ -697,6 +697,10 @@ app.post("/api/check", (req, res) => {
   }
 });
 
+require("./chatbot/chat-routes")(app);
+
+
+
 
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
