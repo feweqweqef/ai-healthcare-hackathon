@@ -1,0 +1,47 @@
+/* ---------- Colour-blind themes: override the page's own colour variables ---------- */
+/* red-green colour blindness (deuteranopia / protanopia) */
+body.theme-redgreen {
+  --red: #D55E00;   --red-text: #8A3500;
+  --amber: #F0E442; --amber-text: #6B5A00;
+  --green: #0072B2; --green-text: #00507F;
+}
+/* blue-yellow colour blindness (tritanopia) */
+body.theme-blueyellow {
+  --red: #D55E00;   --red-text: #8A3500;
+  --amber: #CC79A7; --amber-text: #7A3A5C;
+  --green: #009E73; --green-text: #00674A;
+}
+
+/* ---------- Fonts ---------- */
+body.font-readable { font-family: "Atkinson Hyperlegible", Verdana, Arial, sans-serif; letter-spacing: 0.03em; }
+body.font-serif    { font-family: Georgia, "Times New Roman", serif; }
+
+/* ---------- Chat widget (fixed px so it does not grow with the patient's text size) ---------- */
+#bot-toggle {
+  position: fixed; right: 20px; bottom: 20px; z-index: 50;
+  width: 56px; height: 56px; border: 0; border-radius: 50%;
+  font-size: 24px; line-height: 1; color: #fff; background: #0B5C73; cursor: pointer;
+  box-shadow: 0 2px 10px rgb(0 0 0 / 0.3);
+}
+#bot-panel {
+  position: fixed; right: 20px; bottom: 90px; z-index: 50;
+  display: flex; flex-direction: column;
+  width: 340px; max-width: calc(100vw - 40px);
+  font: 16px/1.4 system-ui, -apple-system, "Segoe UI", sans-serif;
+  color: #14232E; background: #fff;
+  border: 1px solid #ccc; border-radius: 12px;
+  box-shadow: 0 4px 20px rgb(0 0 0 / 0.25);
+}
+#bot-panel[hidden] { display: none; }
+#bot-panel header { display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; border-bottom: 1px solid #ddd; }
+#bot-close { border: 0; background: none; font-size: 22px; line-height: 1; cursor: pointer; }
+#bot-log { height: 230px; overflow-y: auto; padding: 10px; }
+.bot-msg { margin: 6px 0; padding: 8px 10px; border-radius: 10px; max-width: 88%; overflow-wrap: anywhere; }
+.bot-msg.bot  { background: #E3EEF2; }
+.bot-msg.user { background: #0B5C73; color: #fff; margin-left: auto; }
+#bot-form { display: flex; gap: 6px; padding: 10px; border-top: 1px solid #ddd; }
+#bot-input { flex: 1; min-width: 0; padding: 8px; font: inherit; border: 2px solid #14232E; border-radius: 8px; }
+#bot-form button { padding: 8px 12px; font: inherit; font-weight: 700; color: #fff; background: #0B5C73; border: 0; border-radius: 8px; cursor: pointer; }
+#bot-toggle:focus-visible, #bot-form button:focus-visible, #bot-close:focus-visible, #bot-input:focus-visible { outline: 3px solid #F5B301; outline-offset: 2px; }
+
+@media print { #bot-toggle, #bot-panel { display: none !important; } }

@@ -1,0 +1,115 @@
+    <!DOCTYPE html>
+    <html lang="en-GB">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Combined pill check</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    </head>
+    <body>
+
+    <div class="notice" role="note">Hackathon prototype. Not for clinical use. Use fake patient notes only.</div>
+
+    <header class="wrap top">
+        <h1>Combined pill check</h1>
+        <button type="button" class="text-size" id="textSize" aria-pressed="false">Larger text</button>
+    </header>
+
+    <nav class="wrap" aria-label="Progress">
+        <ol class="stepper" id="stepper">
+        <li data-step="notes">1. Notes</li>
+        <li data-step="answers">2. Check answers</li>
+        <li data-step="result">3. Result</li>
+        <li data-step="sheet">4. Patient sheet</li>
+        </ol>
+    </nav>
+
+    <main class="wrap">
+
+        <!-- 1. NOTES -->
+        <section class="screen" id="screen-notes" aria-labelledby="notesTitle">
+        <h2 id="notesTitle" tabindex="-1">Paste the consultation notes</h2>
+        <p class="screen-lede">We pick out the answers for you to check. You stay in charge of every answer.</p>
+
+        <label for="notes" class="visually-hidden">Consultation notes</label>
+        <textarea id="notes" rows="10" placeholder="Paste the notes here"></textarea>
+
+        <div class="actions">
+            <button type="button" class="primary" id="readNotes">Read notes</button>
+            <button type="button" class="quiet" id="useExample">Use example notes</button>
+            <button type="button" class="quiet" id="skipNotes">Skip and fill in by hand</button>
+        </div>
+        <p class="status" id="readStatus" role="status"></p>
+        </section>
+
+        <!-- 2. CHECK ANSWERS -->
+        <section class="screen" id="screen-answers" aria-labelledby="answersTitle" hidden>
+        <h2 id="answersTitle" tabindex="-1">Check the answers</h2>
+        <p class="screen-lede" id="answersLede"></p>
+        <p class="progress" id="answersProgress"></p>
+
+        <div class="answer-list" id="answerList"></div>
+
+        <div class="actions">
+            <button type="button" class="primary" id="seeResult">See result</button>
+            <button type="button" class="quiet" id="backToNotes">Back to notes</button>
+        </div>
+        <p class="status error" id="answersError" role="alert"></p>
+        </section>
+
+        <!-- 3. RESULT -->
+        <section class="screen" id="screen-result" aria-label="Result" hidden>
+        <div class="result-card" id="resultCard" data-status="none">
+            <div class="lamp" aria-hidden="true">
+            <span class="bulb red"></span>
+            <span class="bulb amber"></span>
+            <span class="bulb green"></span>
+            </div>
+            <div class="headline">
+            <h2 id="resultTitle" tabindex="-1">Result</h2>
+            <p id="resultSummary"></p>
+            </div>
+
+            <div class="detail">
+            <h3>Why</h3>
+            <ul id="reasons"></ul>
+
+            <h3>Talk through with the patient</h3>
+            <ul id="followups" class="checklist"></ul>
+            </div>
+        </div>
+
+        <div class="actions">
+            <button type="button" class="primary" id="confirmBtn">Doctor confirms</button>
+            <button type="button" class="quiet" id="backToAnswers">Back to answers</button>
+        </div>
+        <p class="hint">Confirming means you have checked every flag above. It opens the patient sheet.</p>
+        </section>
+
+        <!-- 4. PATIENT SHEET -->
+        <section class="screen" id="screen-sheet" aria-labelledby="sheetTitle" hidden>
+        <article class="sheet" id="sheet">
+            <h2 id="sheetTitle" tabindex="-1"></h2>
+            <p class="stamp" id="sheetStamp"></p>
+            <div id="sheetBody"></div>
+            <p class="sheet-footer">Questions? Ask your doctor or nurse.</p>
+        </article>
+
+        <p class="hint no-print">Placeholder wording. It will be replaced with the approved text.</p>
+
+        <div class="actions no-print">
+            <button type="button" class="primary" id="printBtn">Print sheet</button>
+            <button type="button" class="quiet" id="backToResult">Back to result</button>
+            <button type="button" class="quiet" id="newPatient">Start a new patient</button>
+        </div>
+        </section>
+
+    </main>
+
+    <script src="script.js"></script>
+    <script src="chatbot/chatbot.js"></script>
+    </body>
+    </html>

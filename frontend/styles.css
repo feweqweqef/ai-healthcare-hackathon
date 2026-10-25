@@ -1,0 +1,444 @@
+/* ---------- Tokens ---------- */
+:root {
+  --ink: #14232E;
+  --muted: #52626D;
+  --line: #D3DCE2;
+  --paper: #F2F5F7;
+  --white: #FFFFFF;
+  --accent: #0B5C73;
+  --accent-dark: #084757;
+  --accent-tint: #E3EEF2;
+
+  /* lit lamp colours */
+  --red: #E5392F;
+  --amber: #F5B301;
+  --green: #2FA866;
+
+  /* text colours that stay readable on white */
+  --red-text: #9F1C14;
+  --amber-text: #7A4F00;
+  --green-text: #14603A;
+}
+
+* { box-sizing: border-box; }
+
+html { font-size: 112.5%; }          /* 18px base */
+html.large { font-size: 131%; }      /* "Larger text" button */
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: "Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", sans-serif;
+  line-height: 1.5;
+}
+
+[hidden] { display: none !important; }
+
+:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
+h2:focus { outline: none; }          /* headings get focus by script, not by keyboard */
+
+.visually-hidden {
+  position: absolute;
+  width: 1px; height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.wrap {
+  max-width: 46rem;
+  margin: 0 auto;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+
+/* ---------- Notice + header ---------- */
+.notice {
+  background: #FFF1C9;
+  color: #5A3B00;
+  border-bottom: 1px solid #EBCB78;
+  text-align: center;
+  font-size: 0.85rem;
+  padding: 0.45rem 1rem;
+}
+
+.top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding-top: 1.75rem;
+  padding-bottom: 1.25rem;
+}
+
+h1 {
+  margin: 0;
+  font-size: 1.9rem;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+}
+
+.text-size {
+  flex-shrink: 0;
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--ink);
+  background: transparent;
+  border: 2px solid var(--ink);
+  border-radius: 999px;
+  padding: 0.4rem 1rem;
+  cursor: pointer;
+}
+.text-size:hover { background: #E4EBEF; }
+.text-size[aria-pressed="true"] { background: var(--ink); color: var(--white); }
+
+/* ---------- Stepper (the screens really are a sequence) ---------- */
+.stepper {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.5rem;
+  margin: 0 0 2rem;
+  padding: 0;
+  list-style: none;
+}
+.stepper li {
+  border-top: 4px solid var(--line);
+  padding-top: 0.4rem;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+.stepper li.done { border-color: var(--accent); color: var(--ink); }
+.stepper li[aria-current="step"] { border-color: var(--ink); color: var(--ink); font-weight: 700; }
+
+/* ---------- Screens ---------- */
+.screen { padding-bottom: 3rem; }
+
+.screen h2 {
+  margin: 0 0 0.4rem;
+  font-size: 1.5rem;
+  line-height: 1.2;
+}
+.screen-lede { margin: 0 0 1.25rem; color: var(--muted); max-width: 52ch; }
+
+.progress { margin: 0 0 0.5rem; font-size: 0.85rem; color: var(--muted); }
+.hint     { margin: 0.75rem 0 0; font-size: 0.9rem; color: var(--muted); }
+
+.status { min-height: 1.5rem; margin: 0.75rem 0 0; color: var(--muted); }
+.status.error { color: var(--red-text); font-weight: 700; }
+
+/* ---------- Notes box ---------- */
+/* ---------- Notes box ---------- */
+/* ---------- Form controls ---------- */
+
+/* Large consultation notes box only */
+#notes {
+  display: block;
+  width: 100%;
+  min-height: 14rem;
+  padding: 1rem;
+  font: inherit;
+  line-height: 1.5;
+  color: var(--ink);
+  background: var(--white);
+  border: 2px solid var(--ink);
+  border-radius: 12px;
+  resize: vertical;
+}
+
+/* Dynamically generated questionnaire controls */
+.q select,
+.q input[type="number"],
+.q textarea {
+  width: 100%;
+  min-width: 0;
+  padding: 0.65rem 0.75rem;
+  font: inherit;
+  line-height: 1.4;
+  color: var(--ink);
+  background: var(--white);
+  border: 2px solid var(--ink);
+  border-radius: 10px;
+}
+
+/* Keep medicine and allergy text boxes compact */
+.q textarea {
+  min-height: 3.5rem;
+  resize: vertical;
+}
+
+/* Keep blood pressure inputs compact */
+.q .bp input {
+  width: 6rem;
+  min-width: 0;
+  padding: 0.5rem;
+  font: inherit;
+  text-align: center;
+  color: var(--ink);
+  background: var(--white);
+  border: 2px solid var(--ink);
+  border-radius: 10px;
+}
+
+/* Focus indication */
+.q select:focus-visible,
+.q input:focus-visible,
+.q textarea:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Keep BP controls on one line when possible */
+.bp {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.bp .sep,
+.bp .unit {
+  color: var(--muted);
+}
+
+.bp .unit {
+  font-size: 0.85rem;
+}
+
+/* ---------- Buttons ---------- */
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1.5rem;
+  padding-top: 1.5rem;
+}
+
+.primary {
+  font: inherit;
+  font-weight: 700;
+  color: var(--white);
+  background: var(--accent);
+  border: 0;
+  border-radius: 10px;
+  min-height: 3rem;
+  padding: 0.7rem 1.6rem;
+  cursor: pointer;
+}
+.primary:hover { background: var(--accent-dark); }
+.primary:disabled { background: var(--muted); cursor: wait; }
+
+.quiet {
+  font: inherit;
+  color: var(--muted);
+  background: none;
+  border: 0;
+  padding: 0.5rem 0;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.quiet:hover { color: var(--ink); }
+
+/* ---------- Answer rows ---------- */
+.answer-list { border-top: 2px solid var(--ink); }
+
+.q {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.35rem 1.5rem;
+  align-items: center;
+  padding: 1.1rem 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.q-label { margin: 0; font-weight: 700; }
+.q-hint  { margin: 0.1rem 0 0; font-size: 0.9rem; color: var(--muted); }
+
+.tag {
+  display: inline-block;
+  margin-left: 0.5rem;
+  padding: 0.05rem 0.6rem;
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: var(--accent-dark);
+  background: var(--accent-tint);
+  border-radius: 999px;
+  vertical-align: 0.1em;
+}
+.tag.edited { color: #5A3B00; background: #FFF1C9; }
+
+/* what the notes said, or that they said nothing */
+.evidence {
+  grid-column: 1 / -1;
+  margin: 0.15rem 0 0;
+  padding-left: 0.7rem;
+  font-size: 0.9rem;
+  color: var(--muted);
+  border-left: 3px solid var(--accent);
+}
+.evidence.missing { color: var(--amber-text); border-color: var(--amber); }
+
+/* yes / no / not sure */
+.choices {
+  display: flex;
+  background: var(--white);
+  border: 2px solid var(--ink);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.choices label { position: relative; display: block; }
+.choices label + label { border-left: 2px solid var(--ink); }
+
+.choices input {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.choices span {
+  display: block;
+  min-width: 4.4rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.95rem;
+  text-align: center;
+  cursor: pointer;
+}
+.choices input:hover + span { background: #E4EBEF; }
+.choices input:checked + span { background: var(--ink); color: var(--white); font-weight: 700; }
+.choices input:focus-visible + span { outline: 3px solid var(--accent); outline-offset: -5px; }
+
+/* blood pressure: two numbers */
+.bp { display: flex; align-items: center; gap: 0.5rem; }
+.bp input {
+  width: 5.2rem;
+  padding: 0.5rem;
+  font: inherit;
+  text-align: center;
+  color: var(--ink);
+  background: var(--white);
+  border: 2px solid var(--ink);
+  border-radius: 10px;
+}
+.bp .sep, .bp .unit { color: var(--muted); }
+.bp .unit { font-size: 0.85rem; }
+
+.bp-note { grid-column: 1 / -1; margin: 0.15rem 0 0; font-size: 0.9rem; color: var(--muted); }
+.bp-note.error { color: var(--red-text); font-weight: 700; }
+
+/* ---------- Result ---------- */
+.result-card {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0 1.25rem;
+  padding: 1.5rem;
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+}
+
+/* the traffic light: the one bold thing on the page */
+.lamp {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  align-self: start;
+  padding: 0.7rem;
+  background: var(--ink);
+  border-radius: 2.2rem;
+}
+.bulb {
+  width: 2.6rem;
+  height: 2.6rem;
+  border-radius: 50%;
+  opacity: 0.2;
+  transition: opacity 0.3s, box-shadow 0.3s;
+}
+.bulb.red   { background: var(--red); }
+.bulb.amber { background: var(--amber); }
+.bulb.green { background: var(--green); }
+
+.result-card[data-status="red"]   .bulb.red   { opacity: 1; box-shadow: 0 0 18px 4px rgb(229 57 47 / 0.55); }
+.result-card[data-status="amber"] .bulb.amber { opacity: 1; box-shadow: 0 0 18px 4px rgb(245 179 1 / 0.55); }
+.result-card[data-status="green"] .bulb.green { opacity: 1; box-shadow: 0 0 18px 4px rgb(47 168 102 / 0.55); }
+
+.result-card .headline h2 { margin: 0.2rem 0 0.35rem; font-size: 1.7rem; }
+.result-card .headline p  { margin: 0; color: var(--muted); }
+
+.result-card[data-status="red"]   h2 { color: var(--red-text); }
+.result-card[data-status="amber"] h2 { color: var(--amber-text); }
+.result-card[data-status="green"] h2 { color: var(--green-text); }
+
+.detail {
+  grid-column: 1 / -1;
+  margin-top: 1.25rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--line);
+}
+.detail h3 { margin: 0 0 0.35rem; font-size: 1rem; }
+.detail ul { margin: 0 0 1.25rem; padding-left: 1.1rem; }
+.detail ul:last-child { margin-bottom: 0; }
+.detail li + li { margin-top: 0.35rem; }
+
+.detail .checklist { padding: 0; list-style: none; }
+.checklist label { display: flex; align-items: flex-start; gap: 0.6rem; cursor: pointer; }
+.checklist input {
+  flex-shrink: 0;
+  width: 1.15rem;
+  height: 1.15rem;
+  margin-top: 0.2rem;
+  accent-color: var(--accent);
+}
+
+/* ---------- Patient sheet ---------- */
+.sheet {
+  padding: 2rem;
+  font-size: 1.2rem;
+  line-height: 1.55;
+  background: var(--white);
+  border: 2px solid var(--ink);
+  border-radius: 16px;
+}
+.sheet h2 { margin: 0 0 0.4rem; font-size: 1.55em; line-height: 1.2; }
+.sheet h3 { margin: 1.5rem 0 0.4rem; font-size: 1.1em; }
+.sheet p  { margin: 0 0 0.6rem; }
+.sheet ul { margin: 0 0 0.6rem; padding-left: 1.2rem; }
+.sheet li + li { margin-top: 0.3rem; }
+.sheet .stamp { font-size: 0.8em; color: var(--muted); }
+.sheet .sheet-footer {
+  margin: 1.75rem 0 0;
+  padding-top: 1rem;
+  font-weight: 700;
+  border-top: 1px solid var(--line);
+}
+
+/* ---------- Smaller screens ---------- */
+@media (max-width: 560px) {
+  .stepper { gap: 0.3rem; }
+  .stepper li { font-size: 0.75rem; }
+  .q { grid-template-columns: minmax(0, 1fr); }
+  .choices { justify-self: stretch; }
+  .choices label { flex: 1; }
+  .choices span { min-width: 0; padding-left: 0.4rem; padding-right: 0.4rem; }
+  .result-card { padding: 1.1rem; }
+  .sheet { padding: 1.25rem; }
+  h1 { font-size: 1.6rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; scroll-behavior: auto !important; }
+}
+
+/* ---------- Printing the patient sheet ---------- */
+@media print {
+  body { background: var(--white); }
+  .notice, .top, .stepper, .no-print { display: none !important; }
+  .wrap { max-width: none; padding: 0; }
+  .screen { padding: 0; }
+  .sheet { border: 0; padding: 0; }
+}
