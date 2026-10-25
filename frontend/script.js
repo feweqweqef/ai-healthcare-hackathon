@@ -1138,7 +1138,7 @@ function refreshRow(q) {
       bp.aiSystolic !== null ||
       bp.aiDiastolic !== null;
 
-    const problem = bpProblem();
+    const problem = bpProblem();  
 
     if (ref.note) {
       ref.note.textContent =

@@ -1,9 +1,22 @@
+/* THIS FILE ACTS LIKE A SEPERATE RULE ENGINE THAT COMPARES DOCTOR'S CONFIRMED NOTES 
+AGAINST STRUCTURAL CLINICAL RULES UNDER THE UKMEC - UK Medical Eligibility Criteria for Contraceptive Use*/
+
+/*IT PROVIDES CLASSIFICATIONS FOR WHETHER PARTICULAR CONTRACEPTIVE METHODS ARE MEDICALLY APPROPRIATE FOR PEOPLE
+WITH SPECIFIC MEDICAL CONDITIONS
+
+THERE ARE 4 CLASSIFICATIONS UNDER RULES, CAT 1 - 4; 1 MEANING NO RESTRICTION AND 4 BEING AN UNACCEPTABLE HEALTH
+RISK - WE DIVIDE 1 INTO GREEN, 2 & 3 INTO AMBER & 4 INTO RED*/ 
+
+
+// READING OUR CSV FILES 
 const fs = require("fs");
 const path = require("path");
 const { parse } = require("csv-parse/sync");
 
 const RULES_DIR = path.join(__dirname, "..", "rules");
 
+
+// FUNCTION: FINDS FILE, CHECKS IT EXISTS, READS THE CSV, PARSES TEXT
 function loadCsv(filename) {
     const filePath = path.join(RULES_DIR, filename);
 
@@ -21,6 +34,9 @@ function loadCsv(filename) {
     });
 }
 
+
+
+// FUNCTION: LOADS ALL 3 RULE SETS 
 function loadClinicalRules() {
     return {
         ukmecRules: loadCsv("rules.csv"),
@@ -30,6 +46,17 @@ function loadClinicalRules() {
 }
 
 
+
+
+
+// FUNCTION: UKMEC LOOKUP
+/*HOW IT WORKS:
+1. CREATES AN EMPTY FINDINGS LIST 
+2. EXAMINE EACH PATIENT FACT
+3. MATCH THE FIELD AND THE VALUE 
+4. RETURN THE MATCHING RULE'S INFORMATION
+5. RETURNS FINDINGS
+*/
 function checkUkMecRules(patientFacts, clinicalRules) {
     const findings = [];
 
@@ -62,7 +89,8 @@ function checkUkMecRules(patientFacts, clinicalRules) {
 
 // product-specific contraindication checks
 
-
+//FUNCTION: 2 CHECKS: UKEMC & CONTRAINDICATION 
+//the engine searches for the matching field and value in the contraindication CSV.
 function checkContraindications(patientFacts, clinicalRules) {
     const findings = [];
 
@@ -96,6 +124,8 @@ function checkContraindications(patientFacts, clinicalRules) {
 
 // checkInteraction()
 
+
+//FUNCTION: RECIEVES LISTS OF MEDICATION NAMES
 function checkInteractions(patientMedications, clinicalRules) {
     const findings = [];
 
