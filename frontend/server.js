@@ -182,6 +182,9 @@ function dropUnsupportedAnswers(extracted, notes) {
   }
 }
 
+
+// 
+
 app.post("/api/extract", async (req, res) => {
   try {
     const notes = req.body?.notes;
