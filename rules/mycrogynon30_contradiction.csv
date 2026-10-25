@@ -9,7 +9,7 @@ Microgynon 30,combined_hormonal,diabetes,other_vascular_disease,contraindicated,
 Microgynon 30,combined_hormonal,high_bp,stage_2_or_3,contraindicated,Severe hypertension (SmPC does not define 'severe'; mapped to stage 2 or 3),Do not prescribe combined pill,SmPC 4.3
 Microgynon 30,combined_hormonal,liver_disease,viral_hepatitis_acute,contraindicated,Active viral hepatitis until liver tests return to normal,Do not prescribe combined pill,SmPC 4.3
 Microgynon 30,combined_hormonal,liver_disease,cirrhosis_severe,contraindicated,Severe cirrhosis until liver tests return to normal,Do not prescribe combined pill,SmPC 4.3
-Microgynon 30,combined_hormonal,liver_disease,benign_tumor_fnh,contraindicated,"Current or past liver tumour, benign or malignant",Do not prescribe combined pill,SmPC 4.3
+Microgynon 30,combined_hormonal,liver_disease,benign_tumour_fnh,contraindicated,"Current or past liver tumour, benign or malignant",Do not prescribe combined pill,SmPC 4.3
 Microgynon 30,combined_hormonal,liver_disease,adenoma_or_malignant,contraindicated,"Current or past liver tumour, benign or malignant",Do not prescribe combined pill,SmPC 4.3
 Microgynon 30,combined_hormonal,breast_cancer,current_treatment,contraindicated,Current or past breast cancer,Do not prescribe combined pill,SmPC 4.3
 Microgynon 30,combined_hormonal,breast_cancer,completed_treatment,contraindicated,Current or past breast cancer,Do not prescribe combined pill,SmPC 4.3

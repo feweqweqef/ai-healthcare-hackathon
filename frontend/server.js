@@ -136,6 +136,52 @@ function extractNumericFallbacks(notes, extracted) {
   }
 }
 
+// ---- Evidence guard ----
+// The AI must back every answer with a quote from the notes.
+// If the quote is not really in the notes, we drop the answer so the
+// doctor fills it in, instead of trusting an invented quote.
+function normaliseForQuote(text) {
+  return String(text || "")
+    .toLowerCase()
+    .replace(/[\u2018\u2019`]/g, "'")
+    .replace(/[\u201C\u201D]/g, '"')
+    .replace(/[\s]+/g, " ")
+    .replace(/^[\s"'.,;:!?-]+|[\s"'.,;:!?-]+$/g, "")
+    .trim();
+}
+
+function quoteIsInNotes(evidence, notes) {
+  const quote = normaliseForQuote(evidence);
+  if (!quote) return false;
+  return normaliseForQuote(notes).includes(quote);
+}
+
+function dropUnsupportedAnswers(extracted, notes) {
+  for (const [key, item] of Object.entries(extracted)) {
+    if (!item || typeof item !== "object") continue;
+
+    const hasValue =
+      key === "bp"
+        ? item.systolic != null || item.diastolic != null
+        : item.value !== null && item.value !== undefined && item.value !== "";
+
+    if (!hasValue) continue;
+
+    if (!quoteIsInNotes(item.evidence, notes)) {
+      console.warn(
+        `Dropped "${key}": evidence not found in notes ->`,
+        JSON.stringify(item.evidence)
+      );
+
+      if (key === "bp") {
+        extracted.bp = { systolic: null, diastolic: null, evidence: "" };
+      } else {
+        extracted[key] = { value: null, evidence: "" };
+      }
+    }
+  }
+}
+
 app.post("/api/extract", async (req, res) => {
   try {
     const notes = req.body?.notes;
@@ -301,6 +347,9 @@ Return only the requested JSON.`
       extracted.diabetes = makeField(null, "");
     }
 
+    // Drop any AI answer whose evidence quote is not actually in the notes.
+    dropUnsupportedAnswers(extracted, cleanNotes);
+
     const result = {};
 
     // Numeric fields.
@@ -398,8 +447,8 @@ Return only the requested JSON.`
   }
 });
 
-app.listen(PORT, () => {
-  // Check extracted answers against the CSV-based clinical rules.
+
+// Check extracted answers against the CSV-based clinical rules.
 // Hackathon prototype only — not a clinical decision or prescribing tool.
 app.post("/api/check", (req, res) => {
   try {
@@ -540,79 +589,102 @@ app.post("/api/check", (req, res) => {
     }
 
     // Identify required answers that are missing or unknown.
-const requiredFields = [
-  "age",
-  "height_cm",
-  "weight_kg",
-  "smoking_status",
-  "migraine_aura",
-  "bp_systolic",
-  "bp_diastolic",
-  "personal_clots",
-  "family_clots",
-  "clotting_disorder",
-  "major_surgery_immobilisation",
-  "heart_or_stroke_history",
-  "diabetes",
-  "liver_disease",
-  "breast_cancer",
-  "other_meds",
-  "hep_c_antivirals",
-  "allergies"
-];
+    const requiredFields = [
+      "age",
+      "height_cm",
+      "weight_kg",
+      "smoking_status",
+      "migraine_aura",
+      "bp_systolic",
+      "bp_diastolic",
+      "personal_clots",
+      "family_clots",
+      "clotting_disorder",
+      "major_surgery_immobilisation",
+      "heart_or_stroke_history",
+      "diabetes",
+      "liver_disease",
+      "breast_cancer",
+      "other_meds",
+      "hep_c_antivirals",
+      "allergies"
+    ];
 
-const missingFields = requiredFields.filter(field => {
-  const value = answers[field];
+    const missingFields = requiredFields.filter(field => {
+      const value = answers[field];
 
-  return (
-    value === null ||
-    value === undefined ||
-    value === "" ||
-    value === "unknown"
-  );
-});
+      return (
+        value === null ||
+        value === undefined ||
+        value === "" ||
+        value === "unknown"
+      );
+    });
 
-// Cigarette count is required for current smokers aged 35+.
-if (
-  smokingStatus === "current_smoker" &&
-  age !== null &&
-  age >= 35 &&
-  cigarettes === null
-) {
-  missingFields.push("cigarettes_per_day");
-}
+    // Cigarette count is required for current smokers aged 35+.
+    if (
+      smokingStatus === "current_smoker" &&
+      age !== null &&
+      age >= 35 &&
+      cigarettes === null
+    ) {
+      missingFields.push("cigarettes_per_day");
+    }
+
+    // ---- Combined risk factors (UKMEC 2025, printed p.59) ----
+    // UKMEC names these as examples of CVD risk factors: smoking, diabetes,
+    // hypertension, obesity, dyslipidaemias. "Multiple" means MORE THAN ONE.
+    // Dyslipidaemia is not asked in this form, and age is not named in that row.
+    const riskFactors = [
+      // smoking: current smoker, or stopped under 1 year ago (age 35+)
+      ["under_35", "35plus_under_15", "35plus_15_plus", "35plus_stopped_under_1yr"]
+        .includes(facts.smoking),
+      // diabetes (any type that is not "none" or gestational-only)
+      ["non_vascular", "with_complications", "other_vascular_disease"]
+        .includes(facts.diabetes),
+      // hypertension (stage 1 or above, from the BP reading)
+      ["stage_1", "stage_2_or_3"].includes(facts.high_bp),
+      // obesity (BMI 30 or above)
+      ["30_to_34.9", "35_plus"].includes(facts.bmi)
+    ].filter(Boolean).length;
+
+    if (riskFactors >= 2) {
+      facts.combination = "2_or_more_cvd_risk_factors";
+    }
 
     // Run the CSV-based checks.
     const ukmecFindings = checkUkMecRules(facts, clinicalRules);
     const contraindicationFindings =
       checkContraindications(facts, clinicalRules);
 
-    // Avoid interpreting phrases such as "no regular medicines"
-    // as actual medication names.
+    // ---- Interactions ----
+    // The matcher looks for drug names anywhere in the text, so the doctor
+    // can type "Carbamazepine 200mg" or "She takes carbamazepine".
     const medicationText = String(answers.other_meds || "").trim();
 
+    // "No medicines" style answers: don't list them as "unrecognised".
     const noMedicationReported =
-      /^(no|none|no regular medicines|not on any regular medicines|no medications|no medication)$/i
-        .test(medicationText);
+      /^(no|none|nil)\b/i.test(medicationText) ||
+      /\bnot (?:on|taking) any\b/i.test(medicationText) ||
+      /\bno regular (?:medicines|medications|meds)\b/i.test(medicationText);
 
-    const medications = noMedicationReported || !medicationText
-      ? []
-      : medicationText
-          .split(/[,;\n]+/)
-          .map(name => name.trim())
-          .filter(Boolean);
+    const {
+      findings: interactionFindings,
+      unmatchedMedications
+    } = checkInteractions(medicationText, clinicalRules);
 
-    const interactionFindings =
-      checkInteractions(medications, clinicalRules);
+    const unmatched = noMedicationReported ? [] : unmatchedMedications;
 
-  return res.json({
-  facts,
-  missingFields,
-  ukmecFindings,
-  contraindicationFindings,
-  interactionFindings,
-  prototypeOnly: true
-});
+    return res.json({
+      facts,
+      missingFields,
+      ukmecFindings,
+      contraindicationFindings,
+      interactionFindings,
+      unmatchedMedications: unmatched,
+      prototypeOnly: true
+    });
+
   } catch (error) {
     console.error("Clinical check error:", error);
 
@@ -621,6 +693,9 @@ if (
     });
   }
 });
+
+
+app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
   console.log("Hackathon prototype only. Use fictional notes.");
 });

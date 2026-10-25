@@ -1,5 +1,11 @@
 'use strict';
 
+
+// DOCTOR ENTERS CONSULTATION NOTES SUCH AS PATIENT'S AGE, SMOKING HISTORY ETC
+// AI EXTRACTION THROUGH LOCAL AI QWEN THROUGH OLLAMA TO AUTOFILL FORMS
+// REVIEW AND CORRECTION
+// RULE CHECKING & RESULTS
+
 /* ==========================================================
    1. QUESTIONS
    ========================================================== */
@@ -224,6 +230,8 @@ async function extractFromNotes(notes) {
 
 /* ==========================================================
    4. DEMO RULES — NOT CLINICALLY VALIDATED
+   (no longer used: the server rule engine decides the result.
+   Kept for now so nothing else breaks.)
    ========================================================== */
 
 function getResult(answers) {
@@ -675,11 +683,16 @@ function applyExtraction(found) {
         itemEvidence(migraine)
       );
     } else if (['no', 'none'].includes(value)) {
-      setExtracted(
-        'migraine_aura',
-        'none',
-        itemEvidence(migraine)
-      );
+      const ev = itemEvidence(migraine);
+
+      if (/\bno (?:history of )?migraines?\b/i.test(ev)) {
+        // notes clearly say no migraine at all
+        setExtracted('migraine_aura', 'none', ev);
+      } else if (/migraine/i.test(ev)) {
+        // notes mention migraine but say no aura
+        setExtracted('migraine_aura', 'without_aura', ev);
+      }
+      // anything else: leave blank so the doctor chooses
     } else if (value === 'without_aura') {
       setExtracted(
         'migraine_aura',
@@ -1227,7 +1240,7 @@ function updateProgress() {
 
 
 /* ==========================================================
-   11. CONVERT ANSWERS FOR THE DEMO RULES
+   11. CONVERT ANSWERS FOR THE RULE ENGINE
    ========================================================== */
 
 function flatAnswers() {
@@ -1282,6 +1295,33 @@ $('backToNotes').addEventListener('click', () => {
   go('notes');
 });
 
+const FIELD_LABELS = {
+  age: 'Age',
+  height_cm: 'Height',
+  weight_kg: 'Weight',
+  smoking_status: 'Smoking status',
+  cigarettes_per_day: 'Cigarettes per day',
+  migraine_aura: 'Migraine history',
+  bp_systolic: 'Blood pressure',
+  bp_diastolic: 'Blood pressure',
+  personal_clots: 'Personal history of blood clots',
+  family_clots: 'Family history of blood clots',
+  clotting_disorder: 'Known clotting disorder',
+  major_surgery_immobilisation: 'Major surgery or immobilisation',
+  heart_or_stroke_history: 'Heart disease or stroke history',
+  diabetes: 'Diabetes history',
+  liver_disease: 'Liver disease history',
+  breast_cancer: 'Breast cancer history',
+  other_meds: 'Current medicines',
+  hep_c_antivirals: 'Hepatitis C antivirals',
+  allergies: 'Allergies'
+};
+
+// remove duplicates but keep order
+function unique(list) {
+  return [...new Set(list.filter(Boolean))];
+}
+
 $('seeResult').addEventListener('click', async () => {
   const problem = bpProblem();
 
@@ -1318,45 +1358,57 @@ $('seeResult').addEventListener('click', async () => {
       );
     }
 
-    // Temporary diagnostic output.
-    // We will build the final traffic-light logic after
-    // verifying the API findings.
-state.result = {
-  status:
-  data.contraindicationFindings.some(f => f.status === 'contraindicated') ||
-  data.ukmecFindings.some(f => String(f.category) === '4')
-    ? 'red'
-    : data.missingFields.length > 0 ||
-      data.contraindicationFindings.length > 0 ||
-      data.interactionFindings.length > 0 ||
-      data.ukmecFindings.some(f =>
-        ['2', '3'].includes(String(f.category))
-      )
-        ? 'amber'
-        : 'green',
-  reasons: [
-    ...data.contraindicationFindings.map(
-      finding => finding.reason
-    ),
-    ...data.ukmecFindings
-      .filter(finding => finding.category === '3' || finding.category === '4')
-      .map(finding => `${finding.field}: ${finding.reason}`)
-  ],
-  followups: [
-    ...data.contraindicationFindings.map(
-      finding => finding.followup
-    ),
-    ...data.ukmecFindings
-      .filter(finding => finding.followup)
-      .map(finding => finding.followup)
-  ].filter(Boolean)
-};
+    const ukmec = data.ukmecFindings || [];
+    const contra = data.contraindicationFindings || [];
+    const interactions = data.interactionFindings || [];
+    const unmatched = data.unmatchedMedications || [];
+    const missing = data.missingFields || [];
 
-renderResult();
-go('result');
+    // RED: a product contraindication, or UKMEC category 4.
+    // (The contraindication CSV stores this in the "effect" column.)
+    const isRed =
+      contra.some(f => f.effect === 'contraindicated') ||
+      ukmec.some(f => String(f.category) === '4');
 
-    $('answersError').textContent =
-      'Rule checks completed. Open the browser console to inspect the findings.';
+    // AMBER: anything else worth a look.
+    const isAmber =
+      missing.length > 0 ||
+      contra.length > 0 ||
+      interactions.length > 0 ||
+      unmatched.length > 0 ||
+      ukmec.some(f => ['2', '3'].includes(String(f.category)));
+
+    state.result = {
+      status: isRed ? 'red' : isAmber ? 'amber' : 'green',
+
+      reasons: unique([
+        ...contra.map(f => f.reason),
+
+        ...ukmec
+          .filter(f => ['3', '4'].includes(String(f.category)))
+          .map(f => `${f.field}: ${f.reason}`),
+
+        ...interactions.map(f => `${f.medication}: ${f.effect}`),
+
+        ...unmatched.map(m =>
+          `"${m}" is not on our interaction list. Check the BNF / Stockley's.`
+        ),
+
+        ...missing.map(f =>
+          `Not confirmed: ${FIELD_LABELS[f] || f}. Ask the patient before deciding.`
+        )
+      ]),
+
+      followups: unique([
+        ...contra.map(f => f.followup),
+        ...ukmec.map(f => f.followup),
+        ...interactions.map(f => f.advice),
+        missing.length ? 'Confirm the unanswered questions with the patient.' : null
+      ])
+    };
+
+    renderResult();
+    go('result');
 
   } catch (error) {
     console.error('Rule check failed:', error);
@@ -1384,23 +1436,23 @@ function renderResult() {
   $('resultSummary').textContent = text.summary;
 
   const reasons = $('reasons');
-reasons.innerHTML = '';
+  reasons.innerHTML = '';
 
-if (result.reasons.length > 0) {
-  result.reasons.forEach((reason) => {
+  if (result.reasons.length > 0) {
+    result.reasons.forEach((reason) => {
+      const li = document.createElement('li');
+      li.textContent = reason;
+      reasons.appendChild(li);
+    });
+  } else if (result.status === 'green') {
     const li = document.createElement('li');
-    li.textContent = reason;
+    li.textContent = 'No flags detected by the implemented rules.';
     reasons.appendChild(li);
-  });
-} else if (result.status === 'green') {
-  const li = document.createElement('li');
-  li.textContent = 'No flags detected by the implemented rules.';
-  reasons.appendChild(li);
-} else {
-  const li = document.createElement('li');
-  li.textContent = 'Review the findings and confirm any outstanding information.';
-  reasons.appendChild(li);
-}
+  } else {
+    const li = document.createElement('li');
+    li.textContent = 'Review the findings and confirm any outstanding information.';
+    reasons.appendChild(li);
+  }
 
   const followups = $('followups');
   followups.innerHTML = '';

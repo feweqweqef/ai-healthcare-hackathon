@@ -122,36 +122,82 @@ function checkContraindications(patientFacts, clinicalRules) {
 }
 
 
-// checkInteraction()
+/* ==========================================================
+   INTERACTION CHECK
+   ----------------------------------------------------------
+   Old way: split the box into items, and each item had to equal
+   a CSV name exactly. Almost everything missed.
 
+   New way: for every CSV row, ask "does any name for this drug
+   appear ANYWHERE in the text the doctor typed?"
+   So "Carbamazepine 200mg" and "She takes carbamazepine" both match.
+   ========================================================== */
 
-//FUNCTION: RECIEVES LISTS OF MEDICATION NAMES
-function checkInteractions(patientMedications, clinicalRules) {
+// Extra names for CSV rows whose name can't be matched directly.
+// KEYS must be the CSV name, lowercased, with anything after " (" removed.
+const ALIASES = {
+    "barbiturates incl. phenobarbitone": ["barbiturate", "phenobarbitone", "phenobarbital"],
+    "etoricoxib 60-120 mg/day": ["etoricoxib", "arcoxia"],
+    "ombitasvir/paritaprevir/ritonavir with dasabuvir": ["ombitasvir", "paritaprevir", "dasabuvir", "viekirax", "exviera"],
+    "glecaprevir/pibrentasvir": ["glecaprevir", "pibrentasvir", "maviret"],
+    "sofosbuvir/velpatasvir/voxilaprevir": ["voxilaprevir", "vosevi"],
+    "st john's wort": ["st john", "hypericum"],
+    "ciclosporin": ["cyclosporin", "cyclosporine"]
+};
+
+// Generic CSV rows that aren't real drug names, so we never text-match them.
+const SKIP = new Set([
+    "any other medicine",
+    "laboratory tests",
+    "other antiretrovirals"
+]);
+
+// lowercase, curly apostrophes -> straight, collapse spaces
+function normalise(s) {
+    return String(s || "")
+        .toLowerCase()
+        .replace(/[’‘`]/g, "'")
+        .replace(/\s+/g, " ")
+        .trim();
+}
+
+// All the names we should look for in the text for one CSV row.
+function namesFor(rule) {
+    const base = normalise(String(rule.interacting_drug_or_class || "").split(" (")[0]);
+
+    if (!base || SKIP.has(base)) return [];
+
+    const extra = (ALIASES[base] || []).map(normalise);
+
+    // Combo rows (hep C regimens, "mg/day" rows) only match on their aliases,
+    // otherwise plain "ritonavir" would trigger the hep C row.
+    const isCombo = base.includes("/") || base.includes(" with ");
+
+    return isCombo ? extra : [base, ...extra];
+}
+
+// Returns { findings, unmatchedMedications }
+// unmatchedMedications = things the doctor typed that matched no rule,
+// so we never silently treat "not on our list" as "no interaction".
+function checkInteractions(medicationText, clinicalRules) {
+    const text = normalise(medicationText);
     const findings = [];
+    const unmatchedMedications = [];
 
-    if (!Array.isArray(patientMedications)) {
-        return findings;
-    }
+    if (!text) return { findings, unmatchedMedications };
 
-    for (const medication of patientMedications) {
-        if (typeof medication !== "string" || !medication.trim()) {
-            continue;
-        }
+    const seen = new Set();
 
-        const normalizedMedication = medication.trim().toLowerCase();
+    // 1. Which rules match anywhere in the text?
+    for (const rule of clinicalRules.interactions) {
+        const hit = namesFor(rule).some(name => text.includes(name));
 
-        const matches = clinicalRules.interactions.filter(rule => {
-            const interaction = rule.interacting_drug_or_class
-                .toLowerCase()
-                .trim();
+        if (hit) {
+            const medication = String(rule.interacting_drug_or_class).split(" (")[0];
 
-            // Match the medication name, not just any partial word.
-            const interactionName = interaction.split(" (")[0].trim();
+            if (seen.has(medication)) continue;
+            seen.add(medication);
 
-            return normalizedMedication === interactionName;
-        });
-
-        for (const rule of matches) {
             findings.push({
                 medication,
                 effect: rule.effect,
@@ -161,7 +207,21 @@ function checkInteractions(patientMedications, clinicalRules) {
         }
     }
 
-    return findings;
+    // 2. Which typed items matched nothing?
+    const items = text
+        .split(/[,;\n]+|\band\b/)
+        .map(s => s.trim())
+        .filter(Boolean);
+
+    for (const item of items) {
+        const matched = clinicalRules.interactions.some(rule =>
+            namesFor(rule).some(name => item.includes(name))
+        );
+
+        if (!matched) unmatchedMedications.push(item);
+    }
+
+    return { findings, unmatchedMedications };
 }
 
 
